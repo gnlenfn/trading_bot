@@ -9,8 +9,8 @@ import schedule
 
 #ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
 #SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
-ACCESS_KEY = 'LMnaUA1eX1VsGlk75HkQYsuV2dckQHCJVraW8f9F'
-SECRET_KEY = 'qQvV2VJPp3xiy9Xde0D1PBc1kF4Rx6nkIZwZ2nTX'
+ACCESS_KEY = ''
+SECRET_KEY = ''
 
 
 server_url = 'https://api.upbit.com'
