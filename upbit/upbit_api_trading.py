@@ -95,6 +95,7 @@ def main():
     minute_close_price   = getTradePrice("KRW-"+target)['trade_price']
     print("Bot is Working!")
     if cash_left < 25000: # 잔고 없으면 (손절 or 목표도달 못한 익절)
+        print(f"{datetime.datetime.now()} Sell all left")
         telegram_bot.send_message(f"전체매도 \n\
                                     매도 수량: {current_volume} ETH 개\n \
                                     매도 평단: {get_coin_account('ETH')['avg_buy_price']}\n\
@@ -102,18 +103,21 @@ def main():
         order(market="KRW-"+target, side='ask', vol=current_volume, price=minute_close_price, types='limit')
 
     if current_volume < 0.0005: # 리셋 후 재매수 
+        print(f"{datetime.datetime.now()} Restart Process..")
         order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
         telegram_bot.send_message(f"매수 재시작 \n\
                                     매수 수량: {current_volume} ETH 개\n \
                                     현재 평단: {get_coin_account('ETH')['avg_buy_price']}\n\
                                     현금 잔고: {get_coin_account('KRW')['balance']} 원")
     elif current_avg_price > minute_close_price: # 평단보다 현재가격이 낮은 가격이면 매수
+        print(f"{datetime.datetime.now()} Buy more ETH")
         order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
         telegram_bot.send_message(f"추가 매수 \n\
                                     매수 수량: {current_volume} ETH 개\n \
                                     현재 평단: {get_coin_account('ETH')['avg_buy_price']}\n\
                                     현금 잔고: {get_coin_account('KRW')['balance']} 원")
     elif current_avg_price * 1.1 <= minute_close_price: # 평단 * 1.1 보다 현재 가격이 높으면 매도 
+        print(f"{datetime.datetime.now()} Sold all ETH with benefit")
         telegram_bot.send_message(f"상승으로 익절 \n\
                                     매도 수량: {current_volume} ETH 개\n \
                                     매도 평단: {get_coin_account('ETH')['avg_buy_price']}\n\
@@ -121,6 +125,7 @@ def main():
         order(market="KRW-"+target, side='ask', vol=current_volume, price=minute_close_price, types='limit') # 익절 작업
         order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')   # 익절 후 재매수 
     else:
+        print(f"{datetime.datetime.now()} Buy more ETH")
         order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
         telegram_bot.send_message(f"추가 매수 \n\
                                     매수 수량: {current_volume} ETH 개\n \
@@ -133,8 +138,8 @@ def logging():
 
 
 # 이런식으로 추가도 가능. 매분에 실행
-sched.add_job(main, 'cron',hour=9, minute=1, second=0, id="buy_1")
-sched.add_job(main, 'cron',hour=23, minute=10, second=0, id="buy_2")
+sched.add_job(main, 'cron',hour='9, 23', minute='16', second=0, id="buy_1")
+
 telegram_bot.send_message("한무 매수 시작")
 sched.start()
 print('sched after~')
