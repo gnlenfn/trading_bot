@@ -14,10 +14,10 @@ import datetime
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True,
-            dotenv_path='~/trading_bot/key.env')
+            dotenv_path='~/trading_bot/.env')
 
 ACCESS_KEY = os.getenv('UPBIT_ACCESS_KEY')
-SECRET_KEY = os.getenv['UPBIT_SECRET_KEY']
+SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')
 
 
 server_url = 'https://api.upbit.com'
@@ -130,8 +130,7 @@ def logging():
     print(f"{datetime.datetime.now()} Bot is waiting...")
 ####################################################################
 schedule.every().day.at("09:01").do(main)
-schedule.every().day.at("21:01").do(main)
-schedule.every().day.at("21:40").do(main)
+schedule.every().day.at("22:30").do(main)
 schedule.every(2).hours.do(logging)
 
 
