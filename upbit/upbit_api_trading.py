@@ -5,10 +5,9 @@ import jwt
 import requests
 import uuid
 import os
-import schedule
+from apscheduler.schedulers.background import BackgroundScheduler
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
 import telegram_bot
 import datetime
 from dotenv import load_dotenv
@@ -16,6 +15,8 @@ from dotenv import load_dotenv
 load_dotenv(verbose=True,
             dotenv_path='~/trading_bot/.env')
 
+
+sched = BackgroundScheduler()
 ACCESS_KEY = os.getenv('UPBIT_ACCESS_KEY')
 SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')
 
@@ -129,12 +130,15 @@ def main():
 def logging():
     print(f"{datetime.datetime.now()} Bot is waiting...")
 ####################################################################
-schedule.every().day.at("09:01").do(main)
-schedule.every().day.at("22:30").do(main)
-schedule.every(2).hours.do(logging)
 
 
+# 이런식으로 추가도 가능. 매분에 실행
+sched.add_job(main, 'cron',hour=9, minute=1, second=0, id="buy_1")
+sched.add_job(main, 'cron',hour=23, minute=10, second=0, id="buy_2")
 telegram_bot.send_message("한무 매수 시작")
+sched.start()
+print('sched after~')
+
 while True:
-    schedule.run_pending()
     time.sleep(1)
+
