@@ -1,8 +1,8 @@
 import telegram
 import os
 
-token = os.environ['TELEGRAM_TOKEN']
-chad_id = os.environ['CHAT_ID']
+token = os.getenv('TELEGRAM_TOKEN')
+chad_id = os.getenv('CHAT_ID')
 
 bot = telegram.Bot(token=token)
 

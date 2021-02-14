@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 load_dotenv(verbose=True,
             dotenv_path='~/trading_bot/key.env')
 
-ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
-SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
+ACCESS_KEY = os.getenv('UPBIT_ACCESS_KEY')
+SECRET_KEY = os.getenv['UPBIT_SECRET_KEY']
 
 
 server_url = 'https://api.upbit.com'
