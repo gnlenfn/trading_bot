@@ -11,7 +11,10 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import telegram_bot
 import datetime
+from dotenv import load_dotenv
 
+load_dotenv(verbose=True,
+            dotenv_path='~/trading_bot/key.env')
 
 ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
 SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
