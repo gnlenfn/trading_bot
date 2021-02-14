@@ -13,7 +13,7 @@ import datetime
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True,
-            dotenv_path='~/trading_bot/.env')
+            dotenv_path='~/.env')
 
 
 sched = BackgroundScheduler()
