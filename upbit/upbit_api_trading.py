@@ -7,8 +7,11 @@ import uuid
 import os
 import schedule
 
+
 ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
 SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
+
+
 
 server_url = 'https://api.upbit.com'
 def get_coin_account(target):
