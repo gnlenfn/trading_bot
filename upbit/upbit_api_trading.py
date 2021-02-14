@@ -10,6 +10,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 import telegram_bot
+import datetime
 
 
 #ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
@@ -31,10 +32,9 @@ def get_coin_account(target):
 
     for d in res.json():
         if d['currency'] == target:
-            balance = d['balance']
-            break
+            return d 
+            
     
-    return d #balance
 
 
 def getTradePrice(market):
@@ -89,7 +89,7 @@ def main():
     current_volume = get_coin_account(target)['balance']
     cash_left = get_coin_account("KRW")['balance']
     minute_close_price   = getTradePrice("KRW-"+target)['trade_price']
-    
+    print("Bot is Working!")
     if cash_left < 25000: # 잔고 없으면 (손절 or 목표도달 못한 익절)
         telegram_bot.send_message(f"전체매도 \n\
                                     매도 수량: {current_volume} ETH 개\n \
@@ -116,13 +116,23 @@ def main():
                                     현금 잔고: {get_coin_account('KRW')['balance']} 원")
         order(market="KRW-"+target, side='ask', vol=current_volume, price=minute_close_price, types='limit') # 익절 작업
         order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')   # 익절 후 재매수 
+    else:
+        order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
+        telegram_bot.send_message(f"추가 매수 \n\
+                                    매수 수량: {current_volume} ETH 개\n \
+                                    현재 평단: {get_coin_account('ETH')['avg_buy_price']}\n\
+                                    현금 잔고: {get_coin_account('KRW')['balance']} 원")
 
-#print(get_coin_account("ETH"))
-#print(get_coin_account("KRW"))
+def logging():
+    print(f"{datetime.datetime.now()} Bot is waiting...")
 ####################################################################
 schedule.every().day.at("09:01").do(main)
 schedule.every().day.at("21:01").do(main)
+schedule.every().day.at("21:40").do(main)
+schedule.every(2).hours.do(logging)
 
+
+telegram_bot.send_message("한무 매수 시작")
 while True:
     schedule.run_pending()
     time.sleep(1)
