@@ -7,11 +7,8 @@ import uuid
 import os
 import schedule
 
-#ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
-#SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
-ACCESS_KEY = 'LMnaUA1eX1VsGlk75HkQYsuV2dckQHCJVraW8f9F'
-SECRET_KEY = 'qQvV2VJPp3xiy9Xde0D1PBc1kF4Rx6nkIZwZ2nTX'
-
+ACCESS_KEY = os.environ['UPBIT_ACCESS_KEY']
+SECRET_KEY = os.environ['UPBIT_SECRET_KEY']
 
 server_url = 'https://api.upbit.com'
 def get_coin_account(target):
@@ -39,7 +36,7 @@ def getTradePrice(market):
     querystring = {"market": market, "count": "1"}
 
     response = requests.request("GET", url, params=querystring)
-    #print(response.json())
+    print(response.json()[0])
     return response.json()[0]
 
 
@@ -81,28 +78,32 @@ def order(market, side, vol, price, types):
 """
 
 def main():
-    current_avg_price = get_coin_account("ETH")['avg_buy_price']
-    current_volume = get_coin_account("ETH")['balance']
+    target = "ETH"
+    current_avg_price = get_coin_account(target)['avg_buy_price']
+    current_volume = get_coin_account(target)['balance']
     cash_left = get_coin_account("KRW")['balance']
-    minute_close_price   = getTradePrice("KRW-ETH")['trade_price']
+    minute_close_price   = getTradePrice("KRW-"+target)['trade_price']
     
     if cash_left < 25000: # 잔고 없으면 (손절 or 목표도달 못한 익절)
-        order(market="KRW-ETH", side='ask', vol=current_volume, price=minute_close_price, types='limit')
+        order(market="KRW-"+target, side='ask', vol=current_volume, price=minute_close_price, types='limit')
 
     if current_volume < 0.0005: # 리셋 후 재매수 
-        order(market="KRW-ETH", side='bid', vol='0.01269036', price=minute_close_price, types='limit')
+        order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
 
     elif current_avg_price > minute_close_price: # 평단보다 현재가격이 낮은 가격이면 매수
-        order(market="KRW-ETH", side='bid', vol='0.01269036', price=minute_close_price, types='limit')
+        order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')
     
     elif current_avg_price * 1.1 <= minute_close_price: # 평단 * 1.1 보다 현재 가격이 높으면 매도 
-        order(market="KRW-ETH", side='ask', vol=current_volume, price=minute_close_price, types='limit') # 익절 작업
-        order(market="KRW-ETH", side='bid', vol='0.01269036', price=minute_close_price, types='limit')   # 익절 후 재매수 
+        order(market="KRW-"+target, side='ask', vol=current_volume, price=minute_close_price, types='limit') # 익절 작업
+        order(market="KRW-"+target, side='bid', vol='0.01269036', price=minute_close_price, types='limit')   # 익절 후 재매수 
 
 
 ####################################################################
-
+#minute_close_price   = getTradePrice("KRW-ETH")['trade_price']
+#print(minute_close_price)
+#order(market="KRW-ETH", side='bid', vol='0.01269036', price=minute_close_price, types='limit')
 schedule.every().day.at("09:01").do(main)
+schedule.every().day.at("21:01").do(main)
 
 while True:
     schedule.run_pending()
