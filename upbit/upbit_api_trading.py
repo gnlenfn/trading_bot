@@ -9,11 +9,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import telegram_bot
+import emoji
 import datetime
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True,
-            dotenv_path='~/.env')
+            dotenv_path='../.env')
 
 
 sched = BackgroundScheduler()
@@ -46,7 +47,7 @@ def getTradePrice(market):
     querystring = {"market": market, "count": "1"}
 
     response = requests.request("GET", url, params=querystring)
-    print(response.json()[0])
+    #print(response.json()[0])
     return response.json()[0]
 
 
@@ -77,6 +78,8 @@ def order(market, side, vol, price, types):
 
     res = requests.post(server_url + "/v1/orders", params=query, headers=headers)
 
+##################################################################################
+
 """
 - 매일 같은 시간 기준 (아침/저녁 9시)
 - 원금 100만원 40분할 기준 1회 25000원 매수
@@ -86,10 +89,8 @@ def order(market, side, vol, price, types):
 - 매도 되거나 원금을 모두 소진하면 다시 시작
 
 """
-
-def main():
+def infinite_bid():
     target = "ETH"
-    print(get_coin_account(target))
     current_avg_price = get_coin_account(target)['avg_buy_price']
     current_volume = get_coin_account(target)['balance']
     cash_left = get_coin_account("KRW")['balance']
@@ -146,10 +147,24 @@ f"추가 매수 \n\
 def logging():
     print(f"{datetime.datetime.now()} Bot is waiting...")
 
+# 비트 가격알림 
+def BTCprice_alarm():
+    data = getTradePrice("KRW-BTC")
+    open_p, low_p, high_p = data['opening_price'], data['low_price'], data['high_price']
+    if open_p * 0.99 >= low_p:
+        telegram_bot.send_massage(f"🚨🚨 BTC 폭락!! 🚨🚨\n\
+        현재가격: {data['trade_price']}")
+        print("!! BTC alarm !!")
+    
+    elif open_p * 1.01 <= high_p:
+        telegram_bot.send_massage(f"🚨🚨 BTC 폭등각? 🚨🚨\n\
+        현재가격: {data['trade_price']}")
+        print("!! BTC alarm !!")
 ####################################################################
 
-sched.add_job(main, 'cron', hour='9,21', minute='3', second='30', id="buy_1")
+sched.add_job(infinite_bid, 'cron', hour='9,21', minute='3', second='30', id="buy_1")
 sched.add_job(logging, 'interval', hours=2)
+sched.add_job(BTCprice_alarm, 'interval', seconds=30)
 
 sched.start()
 telegram_bot.send_message("한무 매수 시작")

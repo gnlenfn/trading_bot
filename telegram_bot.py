@@ -1,12 +1,16 @@
 import telegram
 import os
+from dotenv import load_dotenv
+
+load_dotenv(verbose=True,
+            dotenv_path='../.env')
 
 token = os.getenv('TELEGRAM_TOKEN')
-chad_id = os.getenv('CHAT_ID')
+chat_id = os.getenv('CHAT_ID')
 
 bot = telegram.Bot(token=token)
 
 
 def send_message(message):
-    bot.sendMessage(chat_id=chad_id, text=message)
+    bot.send_message(chat_id=chat_id, text=message)
 
