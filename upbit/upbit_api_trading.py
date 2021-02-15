@@ -10,9 +10,9 @@ from urllib.parse import urlencode
 import jwt
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-import telegram_bot
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+import telegram_bot
 
 
 load_dotenv(verbose=True,
