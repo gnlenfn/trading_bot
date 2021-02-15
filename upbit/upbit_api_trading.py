@@ -1,5 +1,4 @@
 from dotenv import load_dotenv
-import telegram_bot
 import datetime
 import hashlib
 import os
@@ -11,6 +10,7 @@ from urllib.parse import urlencode
 import jwt
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
+import telegram_bot
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
