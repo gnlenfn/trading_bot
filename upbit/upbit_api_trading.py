@@ -97,9 +97,9 @@ def order(market, side, vol, price, types):
 
 def infinite_bid():
     target = "ETH"
-    current_avg_price = get_coin_account(target)['avg_buy_price']
-    current_volume = get_coin_account(target)['balance']
-    cash_left = get_coin_account("KRW")['balance']
+    current_avg_price = float(get_coin_account(target)['avg_buy_price'])
+    current_volume = float(get_coin_account(target)['balance'])
+    cash_left = float(get_coin_account("KRW")['balance'])
     minute_close_price = getTradePrice("KRW-"+target)['trade_price']
     print("Bot is Working!")
     if cash_left < '25000':  # 잔고 없으면 (손절 or 목표도달 못한 익절)
