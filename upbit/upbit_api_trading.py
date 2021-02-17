@@ -176,20 +176,19 @@ def BTCprice_alarm():
         현재가격: {data['trade_price']}")
         print("!! BTC alarm !!")
 
-def DOGEprice():
-    data = getTradePrice("BTC-DOGE")
-    telegram_bot.send_message("📈도지가격(사토시)\n"+
-                            f"{data['trade_price']*100000000} 사토시\n"+
-                            "약 111 사토시에 숏 중\n"+
-                            "비트상승 or 도지하락 확인할 것")
+def target_price():
+    data = getTradePrice("KRW-ETH")
+    telegram_bot.send_message("📈이더 가격 알리미\n"+
+                            f"{data['trade_price']} 원\n"
+                            )
 ####################################################################
 
 
 sched.add_job(infinite_bid, 'cron', hour='9,21',
-              minute='3', second='30', id="buy_1")
+              minute='30', second='30', id="buy_1")
 sched.add_job(logging, 'interval', hours=2)
 sched.add_job(BTCprice_alarm, 'interval', seconds=30)
-sched.add_job(DOGEprice, 'interval', hours=1)
+sched.add_job(target_price, 'interval', hours=4)
 
 sched.start()
 telegram_bot.send_message("한무 매수 시작")
