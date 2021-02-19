@@ -27,7 +27,7 @@ def logging():
 
 # 비트 가격알림
 def BTCprice_alarm():
-    data = upbit_basic.getTradePrice("KRW-BTC")
+    data = upbit_basic.get_trade_price("KRW-BTC")
     open_p, low_p, high_p = data['opening_price'], data['low_price'], data['high_price']
     if open_p * 0.99 >= low_p:
         telegram_bot.send_massage(f"🚨🚨 BTC 폭락!! 🚨🚨\n\
@@ -40,7 +40,7 @@ def BTCprice_alarm():
         print("!! BTC alarm !!")
 
 def target_price():
-    data = upbit_basic.getTradePrice("KRW-ETH")
+    data = upbit_basic.get_trade_price("KRW-ETH")
     telegram_bot.send_message("📈이더 가격 알리미\n"+
                             f"{data['trade_price']} 원\n"
                             )

@@ -19,7 +19,7 @@ def infinite_bid():
     current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
     current_volume = float(upbit_basic.get_coin_account(target)['balance'])
     cash_left = float(upbit_basic.get_coin_account("KRW")['balance'])
-    minute_close_price = upbit_basic.getTradePrice("KRW-"+target)['trade_price']
+    minute_close_price = upbit_basic.getTradePrice("KRW-"+target, "1", "1")[0]['trade_price']
     print("Bot is Working!")
     if cash_left < 25000:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
         print(f"{datetime.datetime.now()} Sell all left")
