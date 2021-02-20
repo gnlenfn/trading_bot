@@ -58,7 +58,8 @@ def main():
     ##########################################
 
     sched.start()
-    telegram_bot.send_message("한무 매수 시작")
+    telegram_bot.send_message(f"{args.target_coin} 한무 매수 시작")
+    print(f"Bot Starts to trading {args.target_coin}")
     while True:
         time.sleep(0.5)
 
