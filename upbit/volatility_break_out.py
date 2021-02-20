@@ -37,3 +37,4 @@ def end_of_the_day():
     close_price = upbit_basic.get_trade_price(target, "60")[0]['trade_price']
     current_vol = upbit_basic.get_coin_account(target)['balance']
     upbit_basic.order(target, 'ask', current_vol, close_price, 'limit')
+

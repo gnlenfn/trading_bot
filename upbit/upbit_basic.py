@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import hashlib
 import os
-import sys
 import uuid
 from urllib.parse import urlencode
 

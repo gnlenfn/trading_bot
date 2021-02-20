@@ -1,18 +1,12 @@
-from strad_infinite import infinite_bid
-from dotenv import load_dotenv
 import datetime
 import os
-import sys
-import time
-from urllib.parse import urlencode
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from dotenv import load_dotenv
+
 import strad_infinite
-import upbit_basic
-
-#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import telegram_bot
-
+import upbit_basic
 
 load_dotenv(verbose=True,
             dotenv_path='../.env')
