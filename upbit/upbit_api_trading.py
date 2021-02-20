@@ -13,8 +13,6 @@ import upbit_basic
 load_dotenv(verbose=True,
             dotenv_path='../.env')
 
-
-sched = BackgroundScheduler()
 ACCESS_KEY = os.getenv('UPBIT_ACCESS_KEY')
 SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')
 
@@ -37,12 +35,13 @@ def BTCprice_alarm():
         print("!! BTC alarm !!")
 
 def target_price(target):
+    print(f"Seaching {target} price...")
     data = upbit_basic.get_trade_price("KRW-"+target)[0]
     telegram_bot.send_message(f"📈{target} 가격 알리미\n"+
                             f"{data['trade_price']} 원\n"
                             )
 ####################################################################
-
+    
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
@@ -50,10 +49,11 @@ def main():
     args = parser.parse_args()
 
     ############### schedules ###############
+    sched = BackgroundScheduler()
     sched.add_job(logging, 'interval', hours=2)
     sched.add_job(lambda: strad_infinite.infinite_bid(args.target_coin), 
-                'cron', hour='9,21', second='3', id="buy_1")
-    # sched.add_job(BTCprice_alarm, 'interval', seconds=30)
+                'cron', hour='1,13', second='3', id="buy_1")
+    sched.add_job(BTCprice_alarm, 'interval', seconds=30)
     sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
 
@@ -62,6 +62,7 @@ def main():
     print(f"Bot Starts to trading {args.target_coin}")
     while True:
         time.sleep(0.5)
+
 
 if __name__ == "__main__":
     main()

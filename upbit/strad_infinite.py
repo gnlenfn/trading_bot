@@ -16,84 +16,87 @@ import time
 
 
 def infinite_bid(target):
-    minimum_order = 100000.0
-    budget = 4000000.0
+    print("Bot is Working!")
+    minimum_order = 100_000.0
+    budget = 4_000_000.0
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
-    print("Bot is Working!")
 
-    if not upbit_basic.get_coin_account("ETH"):
-        upbit_basic.order("KRW-"+target, 'bid', order_vol, minute_close_price, 'limit')
-
-        time.sleep(5)
-        telegram_bot.send_message(
-            f"첫 매수 시작\n"+
-            f"매수 수량: {order_vol} ETH 개\n"+
-            f"매수 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-            f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
-
-    current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
-    current_volume = float(upbit_basic.get_coin_account(target)['balance'])
-    cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - budget
-    
-    if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
-        print(f"{datetime.datetime.now()} Sell all left")
-        telegram_bot.send_message(
-            f"전체매도\n"+
-            f"매도 수량: {current_volume} ETH 개\n"+
-            f"매도 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-            f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
-        upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
-            price=minute_close_price, types='limit')
-
-    # elif current_volume < 0.0005:  # 리셋 후 재매수
-    #     print(f"{datetime.datetime.now()} Restart Process..")
-    #     upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
-    #           price=minute_close_price, types='limit')
-    #     telegram_bot.send_message(
-    #         f"매수 재시작\n"+
-    #         f"매수 수량: {order_vol}\n"+
-    #         f"현재 수량: {current_volume} ETH 개\n"+
-    #         f"현재 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-    #         f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
-
-    elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
-        print(f"{datetime.datetime.now()} Buy more ETH")
-        upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-            price=minute_close_price, types='limit')
-
-        time.sleep(5)
-        telegram_bot.send_message(
-            f"추가 매수\n"+
-            f"매수 수량: {order_vol}\n"+
-            f"현재 수량: {current_volume} ETH 개\n"+
-            f"현재 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-            f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
-
-    elif current_avg_price * 1.1 <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
-        print(f"{datetime.datetime.now()} Sold all ETH with benefit")
-        telegram_bot.send_message(
-            f"상승으로 익절\n"+
-            f"매도 수량: {current_volume} ETH 개\n"+
-            f"매도 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-            f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
-        upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
-            price=minute_close_price, types='limit')  # 익절 작업
-
-        time.sleep(5)
-        upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-            price=minute_close_price, types='limit')   # 익절 후 재매수
+    try:
+        current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
+        current_volume = float(upbit_basic.get_coin_account(target)['balance'])
+        cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - budget
         
-    else:
-        print(f"{datetime.datetime.now()} Buy more ETH")
-        upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-            price=minute_close_price, types='limit')
+        if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
+            print(f"{datetime.datetime.now()} Sell all left")
+            telegram_bot.send_message(
+                f"전체매도\n"+
+                f"매도 수량: {target} {current_volume:.8f} 개\n"+
+                f"매도 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:.2f}\n"+
+                f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']:.2f} 원")
+            upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
+                price=minute_close_price, types='limit')
 
-        time.sleep(5)
-        telegram_bot.send_message(
-            f"추가 매수"+
-            f"매수 수량: {order_vol}\n"+
-            f"현재 수량: {current_volume} ETH 개\n"+
-            f"현재 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-            f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+        # elif current_volume < 0.0005:  # 리셋 후 재매수
+        #     print(f"{datetime.datetime.now()} Restart Process..")
+        #     upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
+        #           price=minute_close_price, types='limit')
+        #     telegram_bot.send_message(
+        #         f"매수 재시작\n"+
+        #         f"매수 수량: {order_vol}\n"+
+        #         f"현재 수량: {current_volume} ETH 개\n"+
+        #         f"현재 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
+        #         f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+
+        elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
+            print(f"{datetime.datetime.now()} Buy more {target}")
+            upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
+                price=minute_close_price, types='limit')
+
+            time.sleep(5)
+            telegram_bot.send_message(
+                f"추가 매수\n"+
+                f"매수 수량: {order_vol}\n"+
+                f"현재 수량: {target} {current_volume:.8f} 개\n"+
+                f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+
+        elif current_avg_price * 1.1 <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
+            print(f"{datetime.datetime.now()} Sold all {target} with benefit")
+            telegram_bot.send_message(
+                f"상승으로 익절\n"+
+                f"매도 수량: {target} {current_volume:.8f} 개\n"+
+                f"매도 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+            upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
+                price=minute_close_price, types='limit')  # 익절 작업
+
+            time.sleep(5)
+            upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
+                price=minute_close_price, types='limit')   # 익절 후 재매수
+            
+        else:
+            print(f"{datetime.datetime.now()} Buy more {target}")
+            upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
+                price=minute_close_price, types='limit')
+
+            time.sleep(5)
+            telegram_bot.send_message(
+                f"추가 매수\n"+
+                f"매수 수량: {order_vol}\n"+
+                f"현재 수량: {target} {current_volume:.8f} 개\n"+
+                f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
+    
+    except:
+        if not upbit_basic.get_coin_account(target):
+            upbit_basic.order("KRW-"+target, 'bid', order_vol, minute_close_price, 'limit')
+            print(f"{datetime.datetime.now()} First buying {target}")
+
+            time.sleep(5)
+            telegram_bot.send_message(
+                f"첫 매수 시작\n"+
+                f"매수 수량: {target} {order_vol:.8f} 개\n"+
+                f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+                f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']:.2f} 원")
 
