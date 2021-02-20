@@ -1,3 +1,7 @@
+```shell
+pip install -r requirements.txt
+```
+
 # 자동매매 봇 만들기
 업비트와 ~~키움증권(혹은 크레온)~~ API를 이용한 자동 매매봇 만들기
 
