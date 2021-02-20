@@ -31,19 +31,18 @@ def get_coin_account(target):
     headers = {"Authorization": authorize_token}
 
     res = requests.get(server_url + "/v1/accounts", headers=headers)
-    
     for d in res.json():
         if d['currency'] == target:
             return d
 
 
-def getTradePrice(market):
-    url = 'https://api.upbit.com/v1/candles/minutes/1'
-    querystring = {"market": market, "count": "1"}
+def get_trade_price(market, time='1', count='1'):
+    url = 'https://api.upbit.com/v1/candles/minutes/' + time
+    querystring = {"market": market, "count": count}
 
     response = requests.request("GET", url, params=querystring)
     # print(response.json()[0])
-    return response.json()[0]
+    return response.json()
 
 
 def order(market, side, vol, price, types):
