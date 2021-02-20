@@ -59,4 +59,4 @@ def target_price():
 # while True:
 #     time.sleep(1)
 
-upbit_basic.get_coin_account("ETH")
+strad_infinite.infinite_bid()
