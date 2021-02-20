@@ -15,7 +15,7 @@ import time
 """
 
 
-def infinite_bid(target):
+def infinite_bid(target, profit):
     print("Bot is Working!")
     minimum_order = 100_000.0
     budget = 4_000_000.0
@@ -36,17 +36,19 @@ def infinite_bid(target):
                 f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']:.2f} 원")
             upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
                 price=minute_close_price, types='limit')
+            
+            time.sleep(5)
+            upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
+                price=minute_close_price, types='limit')
+            time.sleep(5)
+            print(f"{datetime.datetime.now()} Start first bid")
+            telegram_bot.send_message(
+                f"매도 후 1회차 매수 시작\n"+
+                f"매수 수량: {order_vol}\n"+
+                f"현재 수량: {target} {current_volume:.8f} 개\n"+
+                f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
 
-        # elif current_volume < 0.0005:  # 리셋 후 재매수
-        #     print(f"{datetime.datetime.now()} Restart Process..")
-        #     upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
-        #           price=minute_close_price, types='limit')
-        #     telegram_bot.send_message(
-        #         f"매수 재시작\n"+
-        #         f"매수 수량: {order_vol}\n"+
-        #         f"현재 수량: {current_volume} ETH 개\n"+
-        #         f"현재 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
-        #         f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
 
         elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
             print(f"{datetime.datetime.now()} Buy more {target}")
@@ -61,7 +63,7 @@ def infinite_bid(target):
                 f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
                 f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
 
-        elif current_avg_price * 1.1 <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
+        elif current_avg_price * (1 + profit) <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
             print(f"{datetime.datetime.now()} Sold all {target} with benefit")
             telegram_bot.send_message(
                 f"상승으로 익절\n"+

@@ -45,15 +45,15 @@ def target_price(target):
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
-    #parser.add_argument('--price', type=int, help='price to buy')
+    parser.add_argument('--profit', type=int, help='profit ratio for benefit')
     args = parser.parse_args()
 
     ############### schedules ###############
     sched = BackgroundScheduler()
     sched.add_job(logging, 'interval', hours=2)
-    sched.add_job(lambda: strad_infinite.infinite_bid(args.target_coin), 
+    sched.add_job(lambda: strad_infinite.infinite_bid(args.target_coin, args.profit), 
                 'cron', hour='1,13', second='3', id="buy_1")
-    sched.add_job(BTCprice_alarm, 'interval', seconds=30)
+    #sched.add_job(BTCprice_alarm, 'interval', seconds=30)
     sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
 
