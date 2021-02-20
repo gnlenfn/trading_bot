@@ -16,7 +16,8 @@ import datetime
 
 def infinite_bid():
     target = "ETH"    
-    minimum_order = 100000
+    minimum_order = 100000.0
+    budget = 4000000.0
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
     print("Bot is Working!")
@@ -31,7 +32,7 @@ def infinite_bid():
 
     current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
     current_volume = float(upbit_basic.get_coin_account(target)['balance'])
-    cash_left = float(upbit_basic.get_coin_account("KRW")['balance'])
+    cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - budget
     
     if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
         print(f"{datetime.datetime.now()} Sell all left")
