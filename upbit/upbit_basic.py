@@ -31,9 +31,10 @@ def get_coin_account(target):
     headers = {"Authorization": authorize_token}
 
     res = requests.get(server_url + "/v1/accounts", headers=headers)
-    
+    print(res)
     for d in res.json():
         if d['currency'] == target:
+            print(d)
             return d
 
 

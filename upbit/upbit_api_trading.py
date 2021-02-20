@@ -1,3 +1,4 @@
+from strad_infinite import infinite_bid
 from dotenv import load_dotenv
 import datetime
 import os
@@ -46,14 +47,16 @@ def target_price():
                             )
 ####################################################################
 
-sched.add_job(strad_infinite.infinite_bid, 'cron', hour='9,21',
-              minute='30', second='3', id="buy_1")
-sched.add_job(logging, 'interval', hours=2)
-sched.add_job(BTCprice_alarm, 'interval', seconds=30)
-sched.add_job(target_price, 'interval', hours=4)
+# sched.add_job(strad_infinite.infinite_bid, 'cron', hour='9,21',
+#               minute='30', second='3', id="buy_1")
+# sched.add_job(logging, 'interval', hours=2)
+# sched.add_job(BTCprice_alarm, 'interval', seconds=30)
+# sched.add_job(target_price, 'interval', hours=4)
 
-sched.start()
-telegram_bot.send_message("한무 매수 시작")
+# sched.start()
+# telegram_bot.send_message("한무 매수 시작")
 
-while True:
-    time.sleep(1)
+# while True:
+#     time.sleep(1)
+
+upbit_basic.get_coin_account("ETH")
