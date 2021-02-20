@@ -2,6 +2,9 @@ import telegram_bot
 import upbit_basic
 import datetime
 import pandas as pd
+import time
+
+#time.sleep(5) 시간 텀 두기
 
 # 9 13 17 21 01 05 4시간봉 갱신 시간
 # 기준 시간 오후 9시 or 오전 1시로 ㄱㄱ

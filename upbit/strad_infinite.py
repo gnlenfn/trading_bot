@@ -1,6 +1,7 @@
 import telegram_bot
 import upbit_basic
 import datetime
+import time
 
 
 """
@@ -24,6 +25,8 @@ def infinite_bid():
 
     if not upbit_basic.get_coin_account("ETH"):
         upbit_basic.order("KRW-"+target, 'bid', order_vol, minute_close_price, 'limit')
+
+        time.sleep(5)
         telegram_bot.send_message(
             f"첫 매수 시작\n"+
             f"매수 수량: {order_vol} ETH 개\n"+
@@ -42,7 +45,7 @@ def infinite_bid():
             f"매도 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
             f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
         upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
-              price=minute_close_price, types='limit')
+            price=minute_close_price, types='limit')
 
     # elif current_volume < 0.0005:  # 리셋 후 재매수
     #     print(f"{datetime.datetime.now()} Restart Process..")
@@ -58,7 +61,9 @@ def infinite_bid():
     elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
         print(f"{datetime.datetime.now()} Buy more ETH")
         upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-              price=minute_close_price, types='limit')
+            price=minute_close_price, types='limit')
+
+        time.sleep(5)
         telegram_bot.send_message(
             f"추가 매수\n"+
             f"매수 수량: {order_vol}\n"+
@@ -74,13 +79,18 @@ def infinite_bid():
             f"매도 평단: {upbit_basic.get_coin_account('ETH')['avg_buy_price']}\n"+
             f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
         upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
-              price=minute_close_price, types='limit')  # 익절 작업
+            price=minute_close_price, types='limit')  # 익절 작업
+
+        time.sleep(5)
         upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-              price=minute_close_price, types='limit')   # 익절 후 재매수
+            price=minute_close_price, types='limit')   # 익절 후 재매수
+        
     else:
         print(f"{datetime.datetime.now()} Buy more ETH")
         upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-              price=minute_close_price, types='limit')
+            price=minute_close_price, types='limit')
+
+        time.sleep(5)
         telegram_bot.send_message(
             f"추가 매수"+
             f"매수 수량: {order_vol}\n"+
