@@ -63,7 +63,7 @@ def infinite_bid(target, profit):
                 f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
                 f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
 
-        elif current_avg_price * (1 + profit) <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
+        elif current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
             print(f"{datetime.datetime.now()} Sold all {target} with benefit")
             telegram_bot.send_message(
                 f"상승으로 익절\n"+
