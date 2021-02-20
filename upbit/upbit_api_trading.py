@@ -1,6 +1,7 @@
 import datetime
 import os
 import time
+import argparse
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
@@ -23,7 +24,7 @@ def logging():
 
 # 비트 가격알림
 def BTCprice_alarm():
-    data = upbit_basic.get_trade_price("KRW-BTC")
+    data = upbit_basic.get_trade_price("KRW-BTC")[0]
     open_p, low_p, high_p = data['opening_price'], data['low_price'], data['high_price']
     if open_p * 0.99 >= low_p:
         telegram_bot.send_massage(f"🚨🚨 BTC 폭락!! 🚨🚨\n\
@@ -35,22 +36,32 @@ def BTCprice_alarm():
         현재가격: {data['trade_price']}")
         print("!! BTC alarm !!")
 
-def target_price():
-    data = upbit_basic.get_trade_price("KRW-ETH")
-    telegram_bot.send_message("📈이더 가격 알리미\n"+
+def target_price(target):
+    data = upbit_basic.get_trade_price("KRW-"+target)[0]
+    telegram_bot.send_message(f"📈{target} 가격 알리미\n"+
                             f"{data['trade_price']} 원\n"
                             )
 ####################################################################
 
-sched.add_job(strad_infinite.infinite_bid, 'cron', hour='9,21',
-            minute='30', second='3', id="buy_1")
-sched.add_job(logging, 'interval', hours=2)
-sched.add_job(BTCprice_alarm, 'interval', seconds=30)
-sched.add_job(target_price, 'interval', hours=4)
+def main():
+    parser = argparse.ArgumentParser(description="tutorial")
+    parser.add_argument('--target-coin', type=str, help='a coin to buy')
+    #parser.add_argument('--price', type=int, help='price to buy')
+    args = parser.parse_args()
 
-sched.start()
-telegram_bot.send_message("한무 매수 시작")
+    ############### schedules ###############
+    sched.add_job(logging, 'interval', hours=2)
+    sched.add_job(lambda: strad_infinite.infinite_bid(args.target_coin), 
+                'cron', hour='9,21', second='3', id="buy_1")
+    # sched.add_job(BTCprice_alarm, 'interval', seconds=30)
+    sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
+    ##########################################
 
-while True:
-    time.sleep(1)
+    sched.start()
+    telegram_bot.send_message("한무 매수 시작")
+    while True:
+        time.sleep(0.5)
+
+if __name__ == "__main__":
+    main()
 

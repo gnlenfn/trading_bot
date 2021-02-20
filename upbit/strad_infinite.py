@@ -15,8 +15,7 @@ import time
 """
 
 
-def infinite_bid():
-    target = "ETH"    
+def infinite_bid(target):
     minimum_order = 100000.0
     budget = 4000000.0
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "1", "1")[0]['trade_price']
