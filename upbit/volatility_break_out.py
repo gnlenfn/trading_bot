@@ -1,43 +1,78 @@
-import telegram_bot 
+import telegram_bot
 import upbit_basic
+import time
 import datetime
 import pandas as pd
-import time
+import datetime
+import requests
 
-#time.sleep(5) 시간 텀 두기
+def get_target_price(ticker):
+    df = pd.json_normalize(upbit_basic.get_trade_price("KRW-"+ticker, 'days', "5"))
+    yesterday = df.loc[1]
 
-# 9 13 17 21 01 05 4시간봉 갱신 시간
-# 기준 시간 오후 9시 or 오전 1시로 ㄱㄱ
-target = "KRW-BORA"
+    today_open = yesterday['trade_price']
+    yesterday_high = yesterday['high_price']
+    yesterday_low = yesterday['low_price']
+    target = today_open + (yesterday_high - yesterday_low) * 0.5
 
-# 24시간 일봉 및 현재 일봉 
-def get_24_price():
-    past_24_price = upbit_basic.get_trade_price(target, "60", "24")
-    columns = ['candle_date_time_kst', 'opening_price', 'high_price', 'low_price', 'trade_price']
-    df = pd.json_normalize(past_24_price)[columns]
-    return df
+    now = datetime.datetime.now()
+    telegram_bot.send_message(
+                f"{now.strftime('%Y-%m-%d %H:%M:%S')} 변동성 돌파 매수\n"+
+                f"{ticker}\n"+
+                f"오늘 시가: {yesterday['trade_price']} 원\n"+
+                f"{target} 원 이상이면 매수\n")
+    return target
 
-def calc_base_price(k):
-    # 변동성 계산 
-    df = get_24_price()
-    high_price = max(df['high_price'])
-    low_price  = min(df['low_price'])
-    volatility = (high_price - low_price) * k
-    base_open_price = upbit_basic.get_trade_price(target)[0]['opening_price'] # 기준시각 시가
-    return high_price, low_price, base_open_price, volatility 
 
-high_price, low_price, base_open_price, volatility  = calc_base_price(0.5)
+def check_orderbook(ticker):
+    url = "https://api.upbit.com/v1/trades/ticks"
+    querystring = {"market": "KRW-"+ticker, "count":"1"}
+    response = requests.request("GET", url, params=querystring)
 
-# 시가는 지속적으로 확인하면서 변동성 이상이면 매수
-def check_breakout(r): # r: 현금대비 투자비율 
-    current_price = upbit_basic.get_trade_price("target")[0]['opening_price']
-    cash_balance = float(upbit_basic.get_coin_account("KRW")['balance'])
-    order_volume = round(cash_balance * r / current_price, 8)
-    if current_price > base_open_price + volatility:
-        upbit_basic.order(target, 'bid', order_volume , current_price, 'limit')
-    
-def end_of_the_day():
-    close_price = upbit_basic.get_trade_price(target, "60")[0]['trade_price']
-    current_vol = upbit_basic.get_coin_account(target)['balance']
-    upbit_basic.order(target, 'ask', current_vol, close_price, 'limit')
+    return response.json()[0]['trade_price']
 
+
+def buy_volatility_break(ticker, target_price, r):
+    now = datetime.datetime.now()
+    current_price = check_orderbook(ticker)
+
+    if current_price > target_price:
+        vol = float(upbit_basic.get_coin_account("KRW")['balance']) * r / current_price
+        #upbit_basic.order("KRW-"+ticker, 'bid', vol, current_price, 'limit')
+
+        telegram_bot.send_message(
+                f"{now.strftime('%Y-%m-%d %H:%M:%S')} 돌파 매수 성공\n"+
+                f"매수가: {current_price} 원\n")
+
+
+def sell_volatility_break(ticker):
+    vol = float(upbit_basic.get_coin_account(ticker)['balance'])
+    #upbit_basic.order("KRW-"+ticker, 'ask', vol, 'market', price=None)
+    telegram_bot.send_message(
+                f"{now.strftime('%Y-%m-%d %H:%M:%S')} 시장가 매도\n"+
+                f"매도 가격: {check_orderbook(ticker)} 원\n"+
+                f"매도 수량: {vol}")
+
+
+now = datetime.datetime.now()
+mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+
+target_price = get_target_price("ADA")
+while True:
+    try:
+        now = datetime.datetime.now()
+        if mid < now < mid + datetime.delta(seconds=10):
+            print("mid night!")
+            now = datetime.datetime.now()
+            mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+            sell_volatility_break("ADA")
+
+        current_price = check_orderbook("ADA")
+        if current_price > target_price:
+            buy_volatility_break("ADA", target_price, 0.2)
+    except:
+        print("ERROR!!")
+        telegram_bot.send_message(
+                "🚨🚨돌파 매수 실패🚨🚨\n에러발생")
+
+    time.sleep(0.5)

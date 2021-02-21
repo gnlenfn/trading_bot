@@ -35,16 +35,18 @@ def get_coin_account(target):
             return d
 
 
-def get_trade_price(market, time='1', count='1'):
-    url = 'https://api.upbit.com/v1/candles/minutes/' + time
+def get_trade_price(market, unit="minutes", count='1', time='1'):
+    if unit == "days":
+        url = f"https://api.upbit.com/v1/candles/{unit}"
+    else:
+        url = f'https://api.upbit.com/v1/candles/{unit}/{time}'
+    
     querystring = {"market": market, "count": count}
-
     response = requests.request("GET", url, params=querystring)
-    # print(response.json()[0])
     return response.json()
 
 
-def order(market, side, vol, price, types):
+def order(market, side, vol, types, price):
     query = {
         'market': market,
         'side': side,

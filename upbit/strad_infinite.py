@@ -16,10 +16,11 @@ import time
 
 
 def infinite_bid(target, profit):
-    print(f"{datetime.datetime.now()} Infinite_Bid Bot is Working!")
+    now = datetime.datetime.now()
+    print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Infinite_Bid Bot is Working!")
     minimum_order = 100_000.0
     non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - 4_000_000.0
-    minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "1", "1")[0]['trade_price']
+    minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
 
     try:
@@ -28,7 +29,7 @@ def infinite_bid(target, profit):
         cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - non_budget
         
         if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
-            print(f"{datetime.datetime.now()} Sell all left")
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Sell all left")
             telegram_bot.send_message(
                 f"전체매도\n"+
                 f"매도 수량: {target} {current_volume:.8f} 개\n"+
@@ -41,7 +42,7 @@ def infinite_bid(target, profit):
             upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
                 price=minute_close_price, types='limit')
             time.sleep(5)
-            print(f"{datetime.datetime.now()} Start first bid")
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Start first bid")
             telegram_bot.send_message(
                 f"매도 후 1회차 매수 시작\n"+
                 f"매수 수량: {order_vol}\n"+
@@ -51,7 +52,7 @@ def infinite_bid(target, profit):
 
 
         elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
-            print(f"{datetime.datetime.now()} Buy more {target}")
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Buy more {target}")
             upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
                 price=minute_close_price, types='limit')
 
@@ -64,7 +65,7 @@ def infinite_bid(target, profit):
                 f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
 
         elif current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
-            print(f"{datetime.datetime.now()} Sold all {target} with benefit")
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Sold all {target} with benefit")
             telegram_bot.send_message(
                 f"상승으로 익절\n"+
                 f"매도 수량: {target} {current_volume:.8f} 개\n"+
@@ -78,7 +79,7 @@ def infinite_bid(target, profit):
                 price=minute_close_price, types='limit')   # 익절 후 재매수
             
         else:
-            print(f"{datetime.datetime.now()} Buy more {target}")
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Buy more {target}")
             upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
                 price=minute_close_price, types='limit')
 
@@ -93,7 +94,7 @@ def infinite_bid(target, profit):
     except:
         print(f"There is no {target} balance at all")
         if not upbit_basic.get_coin_account(target):
-            upbit_basic.order("KRW-"+target, 'bid', order_vol, minute_close_price, 'limit')
+            upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price, 'limit')
             print(f"{datetime.datetime.now()} First buying {target}")
 
             time.sleep(5)

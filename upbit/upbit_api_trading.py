@@ -18,7 +18,8 @@ SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')
 
 
 def logging():
-    print(f"{datetime.datetime.now()} Bot is waiting...")
+    now = datetime.datetime.now()
+    print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Bot is waiting...")
 
 # 비트 가격알림
 def BTCprice_alarm():
