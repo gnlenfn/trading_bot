@@ -47,7 +47,7 @@ def infinite_bid(target, profit):
                 f"매수 수량: {order_vol}\n"+
                 f"현재 수량: {target} {current_volume:.8f} 개\n"+
                 f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
-                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
 
 
         elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
@@ -61,7 +61,7 @@ def infinite_bid(target, profit):
                 f"매수 수량: {order_vol}\n"+
                 f"현재 수량: {target} {current_volume:.8f} 개\n"+
                 f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
-                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
 
         elif current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * 1.1 보다 현재 가격이 높으면 매도
             print(f"{datetime.datetime.now()} Sold all {target} with benefit")
@@ -69,7 +69,7 @@ def infinite_bid(target, profit):
                 f"상승으로 익절\n"+
                 f"매도 수량: {target} {current_volume:.8f} 개\n"+
                 f"매도 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
-                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):.2f} 원")
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
             upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
                 price=minute_close_price, types='limit')  # 익절 작업
 
@@ -101,5 +101,5 @@ def infinite_bid(target, profit):
                 f"첫 매수 시작\n"+
                 f"매수 수량: {target} {order_vol:.8f} 개\n"+
                 f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
-                f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']:.2f} 원")
+                f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
 
