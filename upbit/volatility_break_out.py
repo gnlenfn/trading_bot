@@ -5,6 +5,7 @@ import datetime
 import pandas as pd
 import datetime
 import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 
 def get_target_price(ticker):
     df = pd.json_normalize(upbit_basic.get_trade_price("KRW-"+ticker, 'days', "5"))
@@ -53,13 +54,23 @@ def sell_volatility_break(ticker):
                 f"매도 가격: {check_orderbook(ticker)} 원\n"+
                 f"매도 수량: {vol}")
 
+def logging():
+    now = datetime.datetime.now()
+    print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Bot is on a mission...")
+
+
+sched = BackgroundScheduler()
+sched.add_job(logging, 'interval', minutes=20)
 
 now = datetime.datetime.now()
 mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
 
 target_price = get_target_price("ADA")
+sched.start()
+print("Bot started to perform strategy...")
 while True:
     try:
+        #print("...")
         now = datetime.datetime.now()
         if mid < now < mid + datetime.delta(seconds=10):
             print("mid night!")
