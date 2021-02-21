@@ -16,16 +16,16 @@ import time
 
 
 def infinite_bid(target, profit):
-    print("Bot is Working!")
+    print(f"{datetime.datetime.now()} Infinite_Bid Bot is Working!")
     minimum_order = 100_000.0
-    budget = 4_000_000.0
+    non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - 4_000_000.0
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
 
     try:
         current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
         current_volume = float(upbit_basic.get_coin_account(target)['balance'])
-        cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - budget
+        cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - non_budget
         
         if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
             print(f"{datetime.datetime.now()} Sell all left")
@@ -91,6 +91,7 @@ def infinite_bid(target, profit):
                 f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
     
     except:
+        print(f"There is no {target} balance at all")
         if not upbit_basic.get_coin_account(target):
             upbit_basic.order("KRW-"+target, 'bid', order_vol, minute_close_price, 'limit')
             print(f"{datetime.datetime.now()} First buying {target}")

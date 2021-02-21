@@ -52,8 +52,8 @@ def main():
     sched = BackgroundScheduler()
     sched.add_job(logging, 'interval', hours=2)
     sched.add_job(lambda: strad_infinite.infinite_bid(args.target_coin, args.profit), 
-                'cron', hour='1,13', second='3', id="buy_1")
-    #sched.add_job(BTCprice_alarm, 'interval', seconds=30)
+                'cron', hour='1,13', id="buy_1")
+    sched.add_job(BTCprice_alarm, 'interval', seconds=10)
     sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
 
@@ -62,7 +62,7 @@ def main():
     print(f"Bot Starts to trading {args.target_coin}")
     while True:
         time.sleep(0.5)
-
+    #strad_infinite.infinite_bid("LINK", "0.2")
 
 if __name__ == "__main__":
     main()
