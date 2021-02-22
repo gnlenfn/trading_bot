@@ -37,19 +37,20 @@ def buy_volatility_break(ticker, target_price, r):
     now = datetime.datetime.now()
     current_price = check_orderbook(ticker)
 
-    if current_price > target_price:
-        vol = float(upbit_basic.get_coin_account("KRW")['balance']) * r / current_price
-        #upbit_basic.order("KRW-"+ticker, 'bid', vol, current_price, 'limit')
+    #if float(upbit_basic.get_coin_account("KRW")):
+    vol = float(upbit_basic.get_coin_account("KRW")['balance']) * r / current_price
+    upbit_basic.order("KRW-"+ticker, 'bid', vol, current_price, 'limit')
 
-        telegram_bot.send_message(
-                f"{now.strftime('%Y-%m-%d %H:%M:%S')} 돌파 매수 성공\n"+
-                f"매수가: {current_price} 원\n")
+    telegram_bot.send_message(
+            f"{now.strftime('%Y-%m-%d %H:%M:%S')} 돌파 매수 성공\n"+
+            f"매수가: {current_price} 원\n")
 
 
 def sell_volatility_break(ticker):
     vol = float(upbit_basic.get_coin_account(ticker)['balance'])
-    #upbit_basic.order("KRW-"+ticker, 'ask', vol, 'market', price=None)
-    telegram_bot.send_message(
+    if vol:
+        upbit_basic.order("KRW-"+ticker, 'ask', vol, 'market', price=None)
+        telegram_bot.send_message(
                 f"{now.strftime('%Y-%m-%d %H:%M:%S')} 시장가 매도\n"+
                 f"매도 가격: {check_orderbook(ticker)} 원\n"+
                 f"매도 수량: {vol}")
@@ -61,25 +62,31 @@ def logging():
 
 sched = BackgroundScheduler()
 sched.add_job(logging, 'interval', minutes=20)
-
-now = datetime.datetime.now()
-mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+sched.start()
 
 target_price = get_target_price("ADA")
-sched.start()
+now = datetime.datetime.now()
+#mid = datetime.datetime.now()+ datetime.timedelta(minutes=1)
+mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+"""
+기준시각 정해야함 mid -->  hour 변수 넣으면됨
+
+"""
+print(now, mid)
 print("Bot started to perform strategy...")
 while True:
     try:
-        #print("...")
         now = datetime.datetime.now()
-        if mid < now < mid + datetime.delta(seconds=10):
+        if mid < now < mid + datetime.timedelta(seconds=10):
             print("mid night!")
             now = datetime.datetime.now()
             mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
+            print(f"다음 매도 시간: {mid}")
             sell_volatility_break("ADA")
 
         current_price = check_orderbook("ADA")
         if current_price > target_price:
+            print("buy!")
             buy_volatility_break("ADA", target_price, 0.2)
     except:
         print("ERROR!!")
