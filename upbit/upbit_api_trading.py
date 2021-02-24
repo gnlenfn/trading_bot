@@ -47,6 +47,7 @@ def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
     parser.add_argument('--profit', type=float, help='profit ratio for benefit')
+    parser.add_argument('--min', type=float, help='minimum amount of KRW')
     args = parser.parse_args()
 
     ############### schedules ###############

@@ -15,10 +15,10 @@ import time
 """
 
 
-def infinite_bid(target, profit):
+def infinite_bid(target, profit, min_order):
     now = datetime.datetime.now()
     print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Infinite_Bid Bot is Working!")
-    minimum_order = 100_000.0
+    minimum_order = min_order
     non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - 4_000_000.0
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
