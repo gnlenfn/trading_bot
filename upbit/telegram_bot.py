@@ -3,7 +3,7 @@ import os, sys
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True,
-            dotenv_path='./.env',
+            dotenv_path='../.env',
             override=True)
 
 token = os.getenv('TELEGRAM_TOKEN')

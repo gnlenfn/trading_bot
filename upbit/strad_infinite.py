@@ -104,3 +104,4 @@ def infinite_bid(target, profit, min_order):
                 f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
                 f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
 
+
