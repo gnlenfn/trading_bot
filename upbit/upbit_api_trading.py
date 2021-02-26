@@ -26,12 +26,12 @@ def BTCprice_alarm():
     data = upbit_basic.get_trade_price("KRW-BTC")[0]
     open_p, low_p, high_p = data['opening_price'], data['low_price'], data['high_price']
     if open_p * 0.99 >= low_p:
-        telegram_bot.send_massage(f"🚨🚨 BTC 폭락!! 🚨🚨\n\
+        telegram_bot.send_message(f"🚨🚨 BTC 폭락!! 🚨🚨\n\
         현재가격: {data['trade_price']}")
         print("!! BTC alarm !!")
 
     elif open_p * 1.01 <= high_p:
-        telegram_bot.send_massage(f"🚨🚨 BTC 폭등각? 🚨🚨\n\
+        telegram_bot.send_message(f"🚨🚨 BTC 폭등각? 🚨🚨\n\
         현재가격: {data['trade_price']}")
         print("!! BTC alarm !!")
 
