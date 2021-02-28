@@ -57,6 +57,7 @@ def main():
                 'cron', hour='3, 15', id="buy_1")
     sched.add_job(BTCprice_alarm, 'interval', seconds=10)
     sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
+    sched.add_job(lambda: target_price("ADA"), 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
 
     sched.start()
