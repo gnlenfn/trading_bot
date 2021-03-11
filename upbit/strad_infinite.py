@@ -94,7 +94,7 @@ def infinite_bid(target, profit, min_order):
     except:
         print(f"There is no {target} balance at all")
         if not upbit_basic.get_coin_account(target):
-            upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price, 'limit')
+            upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
             print(f"{datetime.datetime.now()} First buying {target}")
 
             time.sleep(5)
