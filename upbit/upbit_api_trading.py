@@ -43,6 +43,38 @@ def target_price(target):
                             )
 ####################################################################
     
+def sell_make_profit(target, profit, min_order):
+    now = datetime.datetime.now()
+    minimum_order = min_order
+    minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
+    order_vol = minimum_order / minute_close_price
+
+    if not upbit_basic.get_coin_account(target):
+        upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
+        print(f"{datetime.datetime.now()} First buying {target}")
+
+        time.sleep(5)
+        telegram_bot.send_message(
+            f"첫 매수 시작\n"+
+            f"매수 수량: {target} {order_vol:.8f} 개\n"+
+            f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+            f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
+    else:
+        current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
+        current_volume = float(upbit_basic.get_coin_account(target)['balance'])
+        #print(f"not for sale at {minute_close_price}")
+        if current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * target 보다 현재 가격이 높으면 매도
+            print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Sold all {target} with benefit")
+            telegram_bot.send_message(
+                f"상승으로 익절\n"+
+                f"매도 수량: {target} {current_volume:.8f} 개\n"+
+                f"매도 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+                f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
+            upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
+                price=minute_close_price, types='limit')  # 익절 작업
+
+
+
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
@@ -57,7 +89,7 @@ def main():
                 'cron', hour='3, 15', id="buy_1")
     sched.add_job(BTCprice_alarm, 'interval', seconds=10)
     sched.add_job(lambda: target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
-    sched.add_job(lambda: target_price("ADA"), 'cron', hour='1, 9, 13, 17, 21')
+    sched.add_job(lambda: sell_make_profit(args.target_coin, args.profit, args.min), 'interval', seconds=5)
     ##########################################
 
     sched.start()
@@ -65,7 +97,7 @@ def main():
     print(f"Bot Starts to trading {args.target_coin}")
     while True:
         time.sleep(0.5)
-    #strad_infinite.infinite_bid("LINK", "0.2")
+
 
 if __name__ == "__main__":
     main()

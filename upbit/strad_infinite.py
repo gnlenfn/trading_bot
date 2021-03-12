@@ -23,7 +23,18 @@ def infinite_bid(target, profit, min_order):
     minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
     order_vol = minimum_order / minute_close_price
 
-    try:
+    if not upbit_basic.get_coin_account(target):
+        print(f"There is no {target} balance at all")
+        upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
+        print(f"{datetime.datetime.now()} First buying {target}")
+
+        time.sleep(5)
+        telegram_bot.send_message(
+            f"첫 매수 시작\n"+
+            f"매수 수량: {target} {order_vol:.8f} 개\n"+
+            f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+            f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
+    else:
         current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
         current_volume = float(upbit_basic.get_coin_account(target)['balance'])
         cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - non_budget
@@ -91,17 +102,17 @@ def infinite_bid(target, profit, min_order):
                 f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
                 f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance'])} 원")
     
-    except:
-        print(f"There is no {target} balance at all")
-        if not upbit_basic.get_coin_account(target):
-            upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
-            print(f"{datetime.datetime.now()} First buying {target}")
+    # except:
+    #     print(f"There is no {target} balance at all")
+    #     if not upbit_basic.get_coin_account(target):
+    #         upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
+    #         print(f"{datetime.datetime.now()} First buying {target}")
 
-            time.sleep(5)
-            telegram_bot.send_message(
-                f"첫 매수 시작\n"+
-                f"매수 수량: {target} {order_vol:.8f} 개\n"+
-                f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
-                f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
+    #         time.sleep(5)
+    #         telegram_bot.send_message(
+    #             f"첫 매수 시작\n"+
+    #             f"매수 수량: {target} {order_vol:.8f} 개\n"+
+    #             f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
+    #             f"현금 잔고: {upbit_basic.get_coin_account('KRW')['balance']} 원")
 
 
