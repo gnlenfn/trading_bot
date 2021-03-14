@@ -58,7 +58,6 @@ def target_price(target):
 def sell_make_profit(target, profit, min_order):
     try:
         minimum_order = min_order
-        upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trad_price']
         minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
         order_vol = minimum_order / minute_close_price
         if not upbit_basic.get_coin_account(target):
