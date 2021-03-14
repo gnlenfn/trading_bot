@@ -84,8 +84,8 @@ def infinite_bid(target, profit, min_order):
 
             elif current_avg_price > minute_close_price:  # 평단보다 현재가격이 낮은 가격이면 매수
                 # print(f"{now.strftime('%Y-%m-%d %H:%M:%S')} Buy more {target}")
-                # upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
-                #     price=minute_close_price, types='limit')
+                upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, #'0.01269036',
+                    price=minute_close_price, types='limit')
 
                 time.sleep(5)
                 logger.info(
