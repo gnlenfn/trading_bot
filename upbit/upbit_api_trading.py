@@ -60,25 +60,25 @@ def sell_make_profit(target, profit, min_order):
         minimum_order = min_order
         minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
         order_vol = minimum_order / minute_close_price
-        if not upbit_basic.get_coin_account(target):
+        if not upbit_basic.get_coin_account(target): # target coin 보유 없으면
             upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
-            # print(f"{datetime.datetime.now()} First buying {target}")
 
             time.sleep(5)
             logger.info(
-                f"첫 매수 시작\n"+
+                f"첫 매수 시작2\n"+
                 f"매수 수량: {target} {order_vol:.8f} 개\n"+
                 f"매수 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
                 f"현금 잔고: {round(float(upbit_basic.get_coin_account('KRW')['balance']), 3)} 원")
         else:
             current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
             current_volume = float(upbit_basic.get_coin_account(target)['balance'])
-            if current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * target 보다 현재 가격이 높으면 매도
+            if current_avg_price * (1.0 + profit) <= float(minute_close_price):  # 평단 * profit 보다 현재 가격이 높으면 매도
                 logger.info(
                     f"상승으로 익절\n"+
+                    f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
                     f"매도 수량: {target} {current_volume:.8f} 개\n"+
-                    f"매도 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:}\n"+
-                    f"실현 수익: {current_volume * minute_close_price} 원\n"+
+                    f"매도 가격: {current_avg_price}\n"+
+                    f"실현 손익: {current_volume * minute_close_price} 원\n"+
                     f"현금 잔고: {round(float(upbit_basic.get_coin_account('KRW')['balance']), 3)} 원")
                 upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
                     price=minute_close_price, types='limit')  # 익절 작업
