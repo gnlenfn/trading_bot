@@ -35,7 +35,7 @@ class LogstashFormatter(Formatter):
 		super(LogstashFormatter, self).__init__()
 
 	def format(self, record):
-		t = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+		t = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 		return "<i>{datetime}</i><pre>\n{message}</pre>".format(message=record.msg, datetime=t)
 
