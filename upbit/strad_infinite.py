@@ -43,7 +43,7 @@ def infinite_bid(target, profit, min_order):
         if not upbit_basic.get_coin_account(target): # target coin 보유 없으면
             upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
 
-            time.sleep(5)
+            time.sleep(30)
             avg_buy_after = upbit_basic.get_coin_account(target)['avg_buy_price']
             logger.info(
                 f"첫 매수 시작1\n"+
@@ -68,11 +68,11 @@ def infinite_bid(target, profit, min_order):
                 upbit_basic.order(market="KRW-"+target, side='ask', vol=current_volume,
                     price=minute_close_price, types='limit')
                 
-                time.sleep(5)
+                time.sleep(30)
                 upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol,
                     price=minute_close_price, types='limit')
 
-                time.sleep(5)
+                time.sleep(30)
                 avg_buy_after = upbit_basic.get_coin_account(target)['avg_buy_price']
                 logger.info(
                     f"매도 후 1회차 매수 시작\n"+
@@ -88,7 +88,7 @@ def infinite_bid(target, profit, min_order):
                 upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, 
                     price=minute_close_price, types='limit')
 
-                time.sleep(5)
+                time.sleep(30)
                 avg_buy_after = upbit_basic.get_coin_account(target)['avg_buy_price']
                 logger.info(
                     f"추가 매수\n"+
@@ -118,7 +118,7 @@ def infinite_bid(target, profit, min_order):
                 upbit_basic.order(market="KRW-"+target, side='bid', vol=order_vol, 
                     price=minute_close_price, types='limit')
 
-                time.sleep(5)
+                time.sleep(30)
                 avg_buy_after = upbit_basic.get_coin_account(target)['avg_buy_price']
                 logger.info(
                     f"추가 매수\n"+
