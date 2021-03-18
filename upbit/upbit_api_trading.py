@@ -63,7 +63,7 @@ def sell_make_profit(target, profit, min_order):
         if not upbit_basic.get_coin_account(target): # target coin 보유 없으면
             upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
 
-            time.sleep(5)
+            time.sleep(30)
             logger.info(
                 f"첫 매수 시작2\n"+
                 f"매수 수량: {target} {order_vol:.8f} 개\n"+
