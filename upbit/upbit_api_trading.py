@@ -1,4 +1,3 @@
-import datetime
 import os
 import time
 import argparse
@@ -9,8 +8,9 @@ from dotenv import load_dotenv
 
 #import strad_infinite
 from strad_infinite import infinite
+from price_alarm import alarm
 import telegram_bot
-import upbit_basic
+
 
 load_dotenv(verbose=True,
             dotenv_path='../.env')
@@ -34,51 +34,29 @@ stream_formatter = logging.Formatter(f'[%(asctime)s]:%(levelname)s\n{a}\n%(messa
 stream_handler.setFormatter(stream_formatter)
 logger.addHandler(stream_handler)
 
-# 가격알림
-class alarm:
-    # 비트가격 알람
-    def BTCprice_alarm(self):
-        data = upbit_basic.get_trade_price("KRW-BTC")[0]
-        open_p, low_p, high_p = data['opening_price'], data['low_price'], data['high_price']
-        if open_p * 0.99 >= low_p:
-            logger.info(f"🔽🔽🔽 BTC 폭락!! 👎🔽🔽🔽\n\
-            현재가격: {data['trade_price']}")
-
-        elif open_p * 1.01 <= high_p:
-            logger.info(f"🔺🔺🔺 BTC 폭등각? 👍🔺🔺🔺\n\
-            현재가격: {data['trade_price']}")
-
-    def target_price(self, target):
-        data = upbit_basic.get_trade_price("KRW-"+target)[0]
-        logger.info(f"📈{target} 가격 알리미\n"+
-                                f"{data['trade_price']} 원\n"
-                                )
-####################################################################
-
-
 
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
     parser.add_argument('--profit', type=float, help='profit ratio for benefit')
-    #parser.add_argument('--min', type=float, help='minimum amount of KRW')
     parser.add_argument('--budget', type=int, help='total budget for infinite_bid')
     args = parser.parse_args()
 
     buy_time = '4, 12, 20'
 
-    my_strategy = infinite()
-    my_alarm = alarm()
+    my_strategy = infinite(args.budget, args.target_coin, args.profit)
+    my_alarm = alarm(args.target_coin)
+
     ############### schedules ###############
     sched = BackgroundScheduler()
     # strategies
-    sched.add_job(lambda: my_strategy.infinite_bid(args.target_coin, args.min), 
-                'cron', hour=buy_time, id="buy_1")
-    sched.add_job(lambda: my_strategy.sell_make_profit(args.target_coin, args.profit, args.min), 'interval', seconds=10)
+    sched.add_job(my_strategy.infinite_bid, 'cron', second=buy_time, id="buy_1")
+    sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=10, id="sell_1")
     # alarms
-    sched.add_job(my_alarm.BTCprice_alarm, 'interval', minutes=1)
-    sched.add_job(lambda: my_alarm.target_price(args.target_coin), 'cron', hour='1, 9, 13, 17, 21')
+    sched.add_job(my_alarm.BTCprice_alarm, 'cron', second=1)
+    sched.add_job(my_alarm.target_price, 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
+
     logger.info(f"{args.target_coin} 한무 매수 시작\n" +
                             f"매수 예정 시간 {buy_time}시")
 

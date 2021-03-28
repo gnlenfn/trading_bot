@@ -1,9 +1,8 @@
 import telegram
-import os, sys
+import os
 from dotenv import load_dotenv
 import requests
 from logging import Handler, Formatter
-import logging
 import datetime
 
 load_dotenv(verbose=True,
