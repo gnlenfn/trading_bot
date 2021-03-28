@@ -50,7 +50,7 @@ def main():
     ############### schedules ###############
     sched = BackgroundScheduler()
     # strategies
-    sched.add_job(my_strategy.infinite_bid, 'cron', second=buy_time, id="buy_1")
+    sched.add_job(my_strategy.infinite_bid, 'cron', hour=buy_time, id="buy_1")
     sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=10, id="sell_1")
     # alarms
     sched.add_job(my_alarm.BTCprice_alarm, 'cron', second=1)
