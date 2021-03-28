@@ -61,7 +61,8 @@ def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
     parser.add_argument('--profit', type=float, help='profit ratio for benefit')
-    parser.add_argument('--min', type=float, help='minimum amount of KRW')
+    #parser.add_argument('--min', type=float, help='minimum amount of KRW')
+    parser.add_argument('--budget', type=int, help='total budget for infinite_bid')
     args = parser.parse_args()
 
     buy_time = '4, 12, 20'

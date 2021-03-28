@@ -33,13 +33,15 @@ logger.addHandler(stream_handler)
 class infinite:
     def __init__(self):
         self.num = 0
+        self.budget = 2_000_000.0 # 입력받는것 고려
+        self.non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - self.budget
+        self.minimum_order = self.budget // 40
 
-    def infinite_bid(self, target, min_order):
+    def infinite_bid(self, target):
         try:
-            minimum_order = min_order
-            #non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - 4_000_000.0
+            #minimum_order = min_order
             minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
-            order_vol = minimum_order / minute_close_price
+            order_vol = self.minimum_order / minute_close_price
 
             if not upbit_basic.get_coin_account(target): # target coin 보유 없으면
                 upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
@@ -57,9 +59,9 @@ class infinite:
             else:
                 current_avg_price = float(upbit_basic.get_coin_account(target)['avg_buy_price'])
                 current_volume = float(upbit_basic.get_coin_account(target)['balance'])
-                cash_left = float(upbit_basic.get_coin_account("KRW")['balance'])# - non_budget
+                cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - self.non_budget
                 
-                if cash_left < minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
+                if cash_left < self.minimum_order:  # 잔고 없으면 (손절 or 목표도달 못한 익절)
                     logger.info(
                         f"전체매도\n"+
                         f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']:.2f}\n"+
@@ -83,7 +85,6 @@ class infinite:
                         f"매수 수량: {order_vol:,.4f}\n"+
                         f"매수 가격: {minute_close_price}\n"+
                         f"현재 수량: {target} {current_volume:.4f} 개\n"+
-                        #f"현재 평단: {upbit_basic.get_coin_account(target)['avg_buy_price']}\n"+
                         f"현재 평단: {avg_buy_after}\n"+
                         f"현금 잔고: {round(float(upbit_basic.get_coin_account('KRW')['balance']), 3)} 원")
 
@@ -127,9 +128,9 @@ class infinite:
         
     def sell_make_profit(self, target, profit, min_order):
         try:
-            minimum_order = min_order
+            #minimum_order = min_order
             minute_close_price = upbit_basic.get_trade_price("KRW-"+target, "minutes", "1", "1")[0]['trade_price']
-            order_vol = minimum_order / minute_close_price
+            order_vol = self.minimum_order / minute_close_price
             if not upbit_basic.get_coin_account(target): # target coin 보유 없으면
                 upbit_basic.order("KRW-"+target, 'bid', order_vol, 'limit', minute_close_price)
                 self.num += 1
