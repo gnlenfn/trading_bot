@@ -67,7 +67,7 @@ class infinite:
                 self.num +=1
 
                 time.sleep(30)
-                avg_buy_after = upbit_basic.get_coin_account(self.target)['avg_buy_price']
+                avg_buy_after = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
                 logger.info(
                     # 추매 
                     f"{self.num}회차 매수\n"+
