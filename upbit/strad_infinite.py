@@ -59,10 +59,11 @@ class infinite:
             if my_cash_left < self.minimum_order:  
                 logger.info(
                     f"전체매도\n"+
+                    f"{self.num}회차 매수 후 매도\n"+
                     f"현재 평단: {upbit_basic.get_coin_account(self.target)['avg_buy_price']:,.2f}\n"+
                     f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
                     f"매도 가격: {my_avg_price}\n"+
-                    f"실현 손익: {my_current_volume * current_price:,.2f} 원\n"+
+                    f"실현 손익: {my_current_volume * current_price - self.num * self.minimum_order:,.2f} 원\n"+
                     "한사이클 끝!")
                 upbit_basic.order(market="KRW-"+self.target, side='ask', vol=my_current_volume,
                     price=current_price, types='limit')
@@ -117,10 +118,11 @@ class infinite:
                 if my_avg_price * (1.0 + self.profit) <= current_price:  
                     logger.info(
                         f"상승으로 익절\n"+
+                        f"{self.num}회차 매수 후 매도\n"+
                         f"현재 평단: {my_avg_price:,.2f}\n"+
                         f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
                         f"매도 가격: {current_price}\n"+
-                        f"실현 손익: {my_current_volume * current_price:,.2f} 원\n"+
+                        f"실현 손익: {my_current_volume * current_price - self.num * self.minimum_order:,.2f} 원\n"+
                         "한사이클 끝!")
                     upbit_basic.order(market="KRW-"+self.target, side='ask', vol=my_current_volume,
                         price=current_price, types='limit')  # 익절 작업
