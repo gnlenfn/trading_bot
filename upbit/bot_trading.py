@@ -57,8 +57,11 @@ def main():
     sched.add_job(my_alarm.target_price, 'cron', hour='1, 9, 13, 17, 21')
     ##########################################
 
-    logger.info(f"{args.target_coin} 한무 매수 시작\n" +
-                            f"매수 예정 시간 {buy_time}시")
+    logger.info(f"{my_strategy.target} 한무 매수 시작\n" +
+                f"매수 예정 시간 {buy_time}시\n"+
+                f"1회 매수금액: {my_strategy.minimum_order:,.2f}\n"+
+                f"목표 수익률 : {my_strategy.profit * 100}%"
+                )
 
     sched.start()
     while True:
