@@ -83,7 +83,7 @@ class infinite:
                     f"매수 가격: {current_price:,.2f}\n"+
                     f"현재 수량: {self.target} {my_current_volume:.4f} 개\n"+
                     f"현재 평단: {avg_buy_after:,.2f}\n"+
-                    f"현금 잔고: {round(float(upbit_basic.get_coin_account('KRW')['balance']), 3)} 원")
+                    f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):,.2f} 원")
 
         except Exception as ex:
             logger.error("error on infinite_bid")
