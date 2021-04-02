@@ -38,19 +38,19 @@ logger.addHandler(stream_handler)
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
     parser.add_argument('--target-coin', type=str, help='a coin to buy')
-    parser.add_argument('--profit', type=float, help='profit ratio for benefit')
     parser.add_argument('--budget', type=int, help='total budget for infinite_bid')
+    parser.add_argument('--profit', type=float, default=0.2, help='profit ratio for benefit')
+    parser.add_argument('--time', type=str, default='4,12,20' ,help='set an ordering time')
     args = parser.parse_args()
 
-    buy_time = '4, 12, 20'
-
+    order_time = args.time
     my_strategy = infinite(args.budget, args.target_coin, args.profit)
     my_alarm = alarm(args.target_coin)
 
     ############### schedules ###############
     sched = BackgroundScheduler()
     # strategies
-    sched.add_job(my_strategy.infinite_bid, 'cron', hour=buy_time, id="buy_1")
+    sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, id="buy_1")
     sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=10, id="sell_1")
     # alarms
     sched.add_job(my_alarm.BTCprice_alarm, 'cron', second=1)
@@ -58,7 +58,7 @@ def main():
     ##########################################
 
     logger.info(f"{my_strategy.target} 한무 매수 시작\n" +
-                f"매수 예정 시간 {buy_time}시\n"+
+                f"매수 예정 시간 {order_time}시\n"+
                 f"1회 매수금액: {my_strategy.minimum_order:,.2f}\n"+
                 f"목표 수익률 : {my_strategy.profit * 100}%\n"+
                 f"{int(my_strategy.num):#02d}차 매수 진행중"

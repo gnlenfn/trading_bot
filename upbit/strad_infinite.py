@@ -44,7 +44,7 @@ class infinite:
             # my_volume * avg_buy_price --> 매수 금액 
             total = float(upbit_basic.get_coin_account(self.target)['balance']) * float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
             # 매수 금액 // 최소주문금액 --> 현재 몇차매수까지 진행?
-            self.num = (total // self.minimum_order)
+            self.num = int(total // self.minimum_order)
 
     def infinite_bid(self):
         try:
@@ -73,7 +73,7 @@ class infinite:
             elif my_avg_price * (1.0 + self.profit) > current_price :  
                 upbit_basic.order(market="KRW-"+self.target, side='bid', vol=order_vol, 
                     price=current_price, types='limit')
-                self.num +=1
+                self.num += 1
 
                 time.sleep(30)
                 avg_buy_after = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
