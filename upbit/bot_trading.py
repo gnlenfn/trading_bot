@@ -51,7 +51,7 @@ def main():
     sched = BackgroundScheduler()
     # strategies
     sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, id="buy_1")
-    sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=10, id="sell_1")
+    sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=15, id="sell_1")
     # alarms
     sched.add_job(my_alarm.BTCprice_alarm, 'cron', second=1)
     sched.add_job(my_alarm.target_price, 'cron', hour='1, 9, 13, 17, 21')
