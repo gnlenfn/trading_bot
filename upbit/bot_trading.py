@@ -60,8 +60,9 @@ def main():
     logger.info(f"{my_strategy.target} 한무 매수 시작\n" +
                 f"매수 예정 시간 {order_time}시\n"+
                 f"1회 매수금액: {my_strategy.minimum_order:,.2f}\n"+
+                f"총 매수금액: {my_strategy.budget:,d} 원\n"+
                 f"목표 수익률 : {my_strategy.profit * 100}%\n"+
-                f"{int(my_strategy.num):#02d}차 매수 진행중"
+                f"{int(my_strategy.num):#02d}회 매수 함"
                 )
                 
     sched.start()

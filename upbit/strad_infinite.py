@@ -36,7 +36,7 @@ class infinite:
     def __init__(self, budget, target, profit):
         self.num = 0
         self.budget = budget
-        self.non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - self.budget
+        # self.non_budget = float(upbit_basic.get_coin_account("KRW")['balance']) - self.budget
         self.minimum_order = self.budget // 40
         self.target = target
         self.profit = profit
@@ -53,17 +53,32 @@ class infinite:
 
             my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
             my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
-            my_cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - self.non_budget
+            # my_cash_left = float(upbit_basic.get_coin_account("KRW")['balance']) - self.non_budget
             
-            # 잔고 없으면 (손절 or 목표도달 못한 익절)
-            if my_cash_left < self.minimum_order:  
+            if not upbit_basic.get_coin_account(self.target): # target coin 보유 없으면
+                upbit_basic.order("KRW-"+self.target, 'bid', order_vol, 'limit', current_price)
+                self.num += 1
+
+                time.sleep(30)
+                my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
+                my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
                 logger.info(
-                    f"전체매도\n"+
-                    f"{self.num}회차 매수 후 매도\n"+
+                    # 첫 매수
+                    f"{self.num}회차 매수!\n"+
+                    f"매수 수량: {self.target} {order_vol:,.4f} 개\n"+
+                    f"매수 가격: {current_price:,.2f}\n"+
+                    f"현재 수량: {self.target} {my_current_volume:.4f} 개\n"+
+                    f"현재 평단: {my_avg_price:,.2f}\n"+
+                    f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):,.2f} 원")
+
+            # 잔고 없으면 (손절 or 목표도달 못한 익절)
+            elif self.num == 40:  
+                logger.info(
+                    f"{self.num}회 도달 전체매도\n"+
                     f"현재 평단: {upbit_basic.get_coin_account(self.target)['avg_buy_price']:,.2f}\n"+
                     f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
                     f"매도 가격: {my_avg_price}\n"+
-                    f"실현 손익: {my_current_volume * current_price - self.num * self.minimum_order:,.2f} 원\n"+
+                    f"실현 손익: {my_current_volume * current_price - 40 * self.minimum_order:,.2f} 원\n"+
                     "한사이클 끝!")
                 upbit_basic.order(market="KRW-"+self.target, side='ask', vol=my_current_volume,
                     price=current_price, types='limit')
@@ -93,22 +108,23 @@ class infinite:
     def sell_make_profit(self):
         try:
             current_price = upbit_basic.get_trade_price("KRW-"+self.target, "minutes", "1", "1")[0]['trade_price'] # 현재가 1분봉
-            order_vol = self.minimum_order / current_price
+            # order_vol = self.minimum_order / current_price
             if not upbit_basic.get_coin_account(self.target): # target coin 보유 없으면
-                upbit_basic.order("KRW-"+self.target, 'bid', order_vol, 'limit', current_price)
-                self.num += 1
+                pass
+                # upbit_basic.order("KRW-"+self.target, 'bid', order_vol, 'limit', current_price)
+                # self.num += 1
 
-                time.sleep(30)
-                my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
-                my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
-                logger.info(
-                    # 첫 매수
-                    f"{self.num}회차 매수!\n"+
-                    f"매수 수량: {self.target} {order_vol:,.4f} 개\n"+
-                    f"매수 가격: {current_price:,.2f}\n"+
-                    f"현재 수량: {self.target} {my_current_volume:.4f} 개\n"+
-                    f"현재 평단: {my_avg_price:,.2f}\n"+
-                    f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):,.2f} 원")
+                # time.sleep(30)
+                # my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
+                # my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
+                # logger.info(
+                #     # 첫 매수
+                #     f"{self.num}회차 매수!\n"+
+                #     f"매수 수량: {self.target} {order_vol:,.4f} 개\n"+
+                #     f"매수 가격: {current_price:,.2f}\n"+
+                #     f"현재 수량: {self.target} {my_current_volume:.4f} 개\n"+
+                #     f"현재 평단: {my_avg_price:,.2f}\n"+
+                #     f"현금 잔고: {float(upbit_basic.get_coin_account('KRW')['balance']):,.2f} 원")
 
             else:
                 my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
