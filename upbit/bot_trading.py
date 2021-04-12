@@ -37,7 +37,7 @@ logger.addHandler(stream_handler)
 
 def main():
     parser = argparse.ArgumentParser(description="tutorial")
-    parser.add_argument('--target-coin', type=str, help='a coin to buy')
+    parser.add_argument('--target', type=str, help='a coin to buy')
     parser.add_argument('--budget', type=int, help='total budget for infinite_bid')
     parser.add_argument('--profit', type=float, default=0.2, help='profit ratio for benefit')
     parser.add_argument('--time', type=str, default='4,12,20' ,help='set an ordering time')
