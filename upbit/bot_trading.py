@@ -44,8 +44,8 @@ def main():
     args = parser.parse_args()
 
     order_time = args.time
-    my_strategy = infinite(args.budget, args.target_coin, args.profit)
-    my_alarm = alarm(args.target_coin)
+    my_strategy = infinite(args.budget, args.target, args.profit)
+    my_alarm = alarm(args.target)
 
     ############### schedules ###############
     sched = BackgroundScheduler()
