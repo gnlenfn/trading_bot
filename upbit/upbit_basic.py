@@ -25,7 +25,7 @@ def get_coin_account(target):
         'nonce': str(uuid.uuid4()),
     }
 
-    jwt_token = jwt.encode(payload, SECRET_KEY)#.decode('utf-8')
+    jwt_token = jwt.encode(payload, SECRET_KEY).decode('utf-8')
     authorize_token = 'Bearer {}'.format(jwt_token)
     headers = {"Authorization": authorize_token}
 

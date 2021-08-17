@@ -48,7 +48,7 @@ def main():
     my_alarm = alarm(args.target)
 
     ############### schedules ###############
-    sched = BackgroundScheduler()
+    sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
     # strategies
     sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, id="buy_1")
     sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=15, id="sell_1")
