@@ -14,6 +14,7 @@ HOST = os.getenv('HOST')
 PORT = os.getenv("PORT")
 
 engine = create_engine(f'mysql+mysqldb://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/upbit')
+connect = engine.connect()
 session = Session(bind=engine)
 metadata = MetaData()
 Base = declarative_base(bind=engine)
@@ -26,13 +27,17 @@ def create_crypto_table(name):
         time = Column(DateTime, default=datetime.datetime.now())
         ticker = Column(String(10))
         price = Column(Float)
+        volume = Column(Float)
     return Crypto()
 
 
 class Account(Base):
     __tablename__ = 'account'
     id = Column(Integer, primary_key=True)
-    krw = Column(Float)
+    ticker = Column(String(10))
+    balance = Column(Float)
+    avg_buy_price = Column(Float)
+    value = Column(Float)
 
 
 class Records(Base):
@@ -48,11 +53,10 @@ class Records(Base):
     cycle = Column(Integer)            # 몇 번째 싸이클?
 
 
-def insert_crypto(table_name, price): # 매 분 가격 기록
+def insert_crypto(table_name, price, volume): # 매 분 가격 기록
     target = Base.metadata.tables[table_name]
-    t = insert(target).values(time=datetime.datetime.now(), ticker=table_name, price=price)
-    with engine.connect() as conn:
-        result = conn.execute(t)
+    t = insert(target).values(time=datetime.datetime.now(), ticker=table_name, price=price, volume=volume)
+    connect.execute(t)
 
 
 def insert_records(ticker, avg, num, price, holds, round, cycle):
@@ -64,8 +68,37 @@ def insert_records(ticker, avg, num, price, holds, round, cycle):
             purchase_price=price,
             holdings=holds,
             round=round, cycle=cycle)
-    with engine.connect() as conn:
-        result = conn.execute(rec)
+    connect.execute(rec)
+
+
+def insert_accounts(tick, balance, avg):
+    if tick == 'KRW':
+        status = insert(Account).values(ticker=tick,
+                                balance=balance,
+                                avg_buy_price=avg,
+                                value=balance*1)
+    else:
+        status = insert(Account).values(ticker=tick,
+                                    balance=balance,
+                                    avg_buy_price=avg,
+                                    value=balance*avg)
+    connect.execute(status)
+
+
+def update_accounts(tick, balance, avg):
+    if tick == 'KRW':
+        status = update(Account).values(ticker=tick,
+                                balance=balance,
+                                avg_buy_price=avg,
+                                value=balance*1).\
+                            where(Account.ticker==tick)
+    else:
+        status = update(Account).values(ticker=tick,
+                                    balance=balance,
+                                    avg_buy_price=avg,
+                                    value=balance*avg).\
+                                where(Account.ticker==tick)
+    connect.execute(status)
 
 
 def delete_table(table_name):
@@ -82,6 +115,8 @@ if __name__ == "__main__":
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
-    insert_crypto('ETH', 2000.0)
-    delete_table('BTC')
+    insert_crypto('ETH', 2000.0, 11)
+    # delete_table('BTC')
     insert_records('LINK', 33684.59, 1.8388, 29910, 70.9905, 36, 1)
+    insert_accounts(tick='LINK', balance=1.5, avg=2000000.0)
+    update_accounts(tick='LINK', balance=0.5, avg=1000000.0)

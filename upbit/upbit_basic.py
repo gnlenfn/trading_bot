@@ -19,20 +19,23 @@ SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')
 server_url = 'https://api.upbit.com'
 
 
-def get_coin_account(target):
+def get_coin_account(target=None):
     payload = {
         'access_key': ACCESS_KEY,
         'nonce': str(uuid.uuid4()),
     }
 
-    jwt_token = jwt.encode(payload, SECRET_KEY).decode('utf-8')
+    jwt_token = jwt.encode(payload, SECRET_KEY)#.decode('utf-8')
     authorize_token = 'Bearer {}'.format(jwt_token)
     headers = {"Authorization": authorize_token}
 
     res = requests.get(server_url + "/v1/accounts", headers=headers)
-    for d in res.json():
-        if d['currency'] == target:
-            return d
+    if target:
+        for d in res.json():
+            if d['currency'] == target:
+                return d
+    
+    return res.json()
 
 
 def get_trade_price(market, unit="minutes", count='1', time='1'):
