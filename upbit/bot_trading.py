@@ -7,13 +7,13 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 
 #import strad_infinite
-from strad_infinite import infinite
-from price_alarm import alarm
-import telegram_bot
+from service.strad_infinite import infinite
+from service.alarm_dip import alarm
+from service import telegram_bot
 
 
 load_dotenv(verbose=True,
-            dotenv_path='../.env')
+            dotenv_path='../../.env')
 
 ACCESS_KEY = os.getenv('UPBIT_ACCESS_KEY')
 SECRET_KEY = os.getenv('UPBIT_SECRET_KEY')

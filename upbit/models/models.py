@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, relationship
 from sqlalchemy.ext.declarative import declarative_base
 import pymysql
 import datetime
-import os, time
+import os
 from dotenv import load_dotenv
 
 pymysql.install_as_MySQLdb()
