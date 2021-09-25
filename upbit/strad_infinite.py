@@ -1,12 +1,12 @@
+
 import telegram_bot
 import upbit_basic
 import time
 import logging
-import math
 
 
 """
-- 매일 같은 시간 기준 (아침/저녁 9시)
+- 매일 같은 시간 기준 (ex.아침/저녁 9시)
 - 원금 100만원 40분할 기준 1회 25000원 매수
 - 25000원 기준 첫 매수 수량을 반복적으로 매수 --> ETH 0.01269036
 - 평단 아래이면 매수 / 아니면 pass

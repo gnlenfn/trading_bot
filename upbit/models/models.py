@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 pymysql.install_as_MySQLdb()
-load_dotenv(verbose=True, dotenv_path='../../.env')
+load_dotenv(verbose=True, dotenv_path='/home/gnlenfn/pipe/trading_bot/.env')
 USERNAME = os.getenv('USERNAME')
 PASSWORD = os.getenv('PASSWORD')
 HOST = os.getenv('HOST')

@@ -43,7 +43,7 @@ def get_trade_price(market, unit="minutes", count='1', time='1'):
     
     querystring = {"market": market, "count": count}
     response = requests.request("GET", url, params=querystring)
-    return response.json()
+    return response.json()[0]
 
 
 def order(market, side, vol, types, price):
