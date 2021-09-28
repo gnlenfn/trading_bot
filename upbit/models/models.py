@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 pymysql.install_as_MySQLdb()
-load_dotenv(verbose=True, dotenv_path='../../../.env')
+load_dotenv(verbose=True, dotenv_path='../../.env')
 USERNAME = os.getenv('USERNAME')
 PASSWORD = os.getenv('PASSWORD')
 HOST = os.getenv('HOST')
@@ -67,10 +67,11 @@ class Records(Base):
     id = Column(Integer, primary_key=True)
     time = Column(DateTime, default=datetime.datetime.now())
     ticker = Column(String(10))
+    order = Column(String(5))          # 거래 타입
     avg_purchase_price = Column(Float) # 평단
-    num_of_purchase = Column(Float)    # 매수 수량
-    purchase_price = Column(Float)     # 매수 가격
-    holdings = Column(Float)           # 보유 수량
+    num_of_trade = Column(Float)       # 거래 수량
+    trade_price = Column(Float)        # 거래 가격
+    holdings = Column(Float)           # 거래 후 보유 수량
     round = Column(Integer)            # 회차
     cycle = Column(Integer)            # 몇 번째 싸이클?
 
@@ -81,15 +82,16 @@ def insert_crypto(table_name, price, volume): # 매 분 가격 기록
     connect.execute(t)
 
 
-def insert_records(ticker, avg, num, price, holds, round, cycle):
+def insert_records(ticker, order, avg, num, price, holds, rounds, cycle):
     target = Base.metadata.tables['records']
     rec = insert(target).values(time=datetime.datetime.now(),
             ticker=ticker,
+            order=order,
             avg_purchase_price=avg,
-            num_of_purchase=num,
-            purchase_price=price,
+            num_of_trade=num,
+            trade_price=price,
             holdings=holds,
-            round=round, cycle=cycle)
+            round=rounds, cycle=cycle)
     connect.execute(rec)
 
 
@@ -143,3 +145,7 @@ def delete_table(table_name):
     target = Base.metadata.tables[table_name]
     target.drop(engine)
 
+
+def reset_db(engine=engine):
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
