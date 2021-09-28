@@ -6,10 +6,9 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 
-#import strad_infinite
 from service.strad_infinite import infinite
-from service.alarm_dip import alarm
 from service import telegram_bot
+from pipeline import *
 
 
 load_dotenv(verbose=True,
@@ -36,26 +35,28 @@ logger.addHandler(stream_handler)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="tutorial")
-    parser.add_argument('--target', type=str, help='a coin to buy')
-    parser.add_argument('--budget', type=int, help='total budget for infinite_bid')
+    parser = argparse.ArgumentParser(description="bot trading and make data pipeline with upbit API")
+    parser.add_argument('--target', type=str, help='a ticker of coin to buy')
+    parser.add_argument('--budget', type=int, help='total budget for strategy')
     parser.add_argument('--profit', type=float, default=0.2, help='profit ratio for benefit')
     parser.add_argument('--time', type=str, default='4,12,20' ,help='set an ordering time')
+    parser.add_argument('--watch', type=str, default='BTC ETH LINK', help='tickers to save price on database')
     args = parser.parse_args()
 
     order_time = args.time
     my_strategy = infinite(args.budget, args.target, args.profit)
-    my_alarm = alarm(args.target)
 
     ############### schedules ###############
     sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
     # strategies
-    sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, id="buy_1")
+    sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, second='5', id="buy_1")
     sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=15, id="sell_1")
-    # alarms
-    sched.add_job(my_alarm.BTCprice_alarm, 'cron', second=1)
-    sched.add_job(my_alarm.target_price, 'cron', hour='1, 9, 13, 17, 21')
+    # pipeline
+    tickers = args.watch.split()
+    sched.add_job(collect_price, 'cron', second='0', args=[tickers], id='collect price')
+    sched.add_job(collect_account, 'cron', second='3', id='check account')
     ##########################################
+
 
     logger.info(f"{my_strategy.target} 한무 매수 시작\n" +
                 f"매수 예정 시간 {order_time}시\n"+
