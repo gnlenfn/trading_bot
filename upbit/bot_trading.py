@@ -49,7 +49,7 @@ def main():
     ############### schedules ###############
     sched = BackgroundScheduler({'apscheduler.timezone': 'Asia/Seoul'})
     # strategies
-    sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, second='5', id="buy_1")
+    sched.add_job(my_strategy.infinite_bid, 'cron', hour=order_time, minute='5', id="buy_1")
     sched.add_job(my_strategy.sell_make_profit, 'interval', seconds=15, id="sell_1")
     # pipeline
     tickers = args.watch.split()
