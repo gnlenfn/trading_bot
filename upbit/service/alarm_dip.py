@@ -1,6 +1,6 @@
 import logging
 import telegram_bot
-import upbit_basic
+from service import upbit_basic
 
 # logging
 logger = logging.getLogger("alarm")
