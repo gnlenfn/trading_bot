@@ -57,6 +57,9 @@ if __name__ == "__main__":
 
     sched.add_job(collect_price, 'cron', minute='0, 15, 30, 45', args=[tickers])
     sched.add_job(collect_account, 'cron', minute='20')
-
-    while True:
-        time.sleep(1)
+    crypto = Crypto.for_symbol("LINK")
+    s = session.query(crypto).all()
+    q = session.query(crypto.price).order_by(crypto.time.desc()).first()[0]
+    print(q)
+    # while True:
+    #     time.sleep(1)
