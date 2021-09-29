@@ -53,7 +53,7 @@ class infinite:
                 insert_records(ticker=self.target, order='buy', avg=my_avg_price,
                                     num=order_vol, price=current_price,
                                     holds=my_current_volume,
-                                    rounds=self.num, cycle=self.num // 40)
+                                    rounds=self.num, cycle=self.num // 40 + 1)
 
                 logger.info(
                     f"{self.num % 40}회차 매수!\n"+
@@ -68,7 +68,7 @@ class infinite:
                 insert_records(ticker=self.target, order='sell', avg=my_avg_price,
                                 num=order_vol, price=current_price,
                                 holds=0,
-                                rounds=self.num, cycle=self.num % 40)
+                                rounds=self.num, cycle=self.num // 40 + 1)
                 logger.info(
                     f"{self.num % 40}회 도달 전체매도\n"+
                     f"현재 평단: {upbit_basic.get_coin_account(self.target)['avg_buy_price']:,.2f}\n"+
@@ -91,7 +91,7 @@ class infinite:
                 insert_records(ticker=self.target, order='buy', avg=my_avg_price,
                                 num=order_vol, price=current_price,
                                 holds=my_current_volume,
-                                rounds=self.num, cycle=self.num % 40)
+                                rounds=self.num, cycle=self.num // 40 + 1)
 
                 avg_buy_after = session.query(Account.avg_buy_price).filter(Account.ticker == self.target).first()[0]
 
@@ -133,7 +133,7 @@ class infinite:
                 insert_records(ticker=self.target, order='sell', avg=my_avg_price,
                                     num=my_current_volume, price=current_price,
                                     holds=0,
-                                    rounds=self.num, cycle=self.num % 40)
+                                    rounds=self.num, cycle=self.num // 40 + 1)
 
         except Exception as ex:
             logger.error("error on sell_make_profit")
