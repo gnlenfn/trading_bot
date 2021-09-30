@@ -111,28 +111,30 @@ class infinite:
     def sell_make_profit(self):
         try:
             current_price = upbit_basic.get_trade_price("KRW-"+self.target, "minutes", "1", "1")['trade_price'] # 현재가 1분봉
-            my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
-            my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
-
-            
-            # 평단 * profit 보다 현재 가격이 높으면 매도
-            if my_avg_price * (1.0 + self.profit) <= current_price:  
-                logger.info(
-                    f"상승으로 익절\n"+
-                    f"{self.num}회차 매수 후 매도\n"+
-                    f"현재 평단: {my_avg_price:,.2f}\n"+
-                    f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
-                    f"매도 가격: {current_price}\n"+
-                    f"실현 손익: {my_current_volume * current_price - self.num * self.minimum_order:,.2f} 원\n"+
-                    "한사이클 끝!")
-                upbit_basic.order(market="KRW-"+self.target, side='ask', vol=my_current_volume,
-                    price=current_price, types='limit')  # 익절 작업
+            if not upbit_basic.get_coin_account(self.target): # target coin 보유 없으면
+                pass
+            else:
+                my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
+                my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
                 
-                time.sleep(30)
-                insert_records(ticker=self.target, order='sell', avg=my_avg_price,
-                                    num=my_current_volume, price=current_price,
-                                    holds=0,
-                                    rounds=self.num, cycle=self.num // 40 + 1)
+                # 평단 * profit 보다 현재 가격이 높으면 매도
+                if my_avg_price * (1.0 + self.profit) <= current_price:  
+                    logger.info(
+                        f"상승으로 익절\n"+
+                        f"{self.num}회차 매수 후 매도\n"+
+                        f"현재 평단: {my_avg_price:,.2f}\n"+
+                        f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
+                        f"매도 가격: {current_price}\n"+
+                        f"실현 손익: {my_current_volume * current_price - self.num * self.minimum_order:,.2f} 원\n"+
+                        "한사이클 끝!")
+                    upbit_basic.order(market="KRW-"+self.target, side='ask', vol=my_current_volume,
+                        price=current_price, types='limit')  # 익절 작업
+                    
+                    time.sleep(30)
+                    insert_records(ticker=self.target, order='sell', avg=my_avg_price,
+                                        num=my_current_volume, price=current_price,
+                                        holds=0,
+                                        rounds=self.num, cycle=self.num // 40 + 1)
 
         except Exception as ex:
             logger.error("error on sell_make_profit")
