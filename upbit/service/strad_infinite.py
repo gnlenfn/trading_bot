@@ -70,8 +70,7 @@ class infinite:
                                 holds=0,
                                 rounds=self.num, cycle=self.num // 40 + 1)
                 logger.info(
-                    f"{self.num % 40}회 도달 전체매도\n"+
-                    f"현재 평단: {upbit_basic.get_coin_account(self.target)['avg_buy_price']:,.2f}\n"+
+                    f"{self.num % (40)}회 도달 전체매도\n"+
                     f"매도 수량: {self.target} {my_current_volume:,.4f} 개\n"+
                     f"매도 가격: {my_avg_price}\n"+
                     f"실현 손익: {my_current_volume * current_price - 40 * self.minimum_order:,.2f} 원\n"+
