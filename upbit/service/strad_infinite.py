@@ -111,11 +111,11 @@ class infinite:
     def sell_make_profit(self):
         try:
             current_price = upbit_basic.get_trade_price("KRW-"+self.target, "minutes", "1", "1")['trade_price'] # 현재가 1분봉
-            if not upbit_basic.get_coin_account(self.target): # target coin 보유 없으면
+            if not session.query(Account).filter(Account.ticker == self.target).first():
                 pass
             else:
-                my_avg_price = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
-                my_current_volume = float(upbit_basic.get_coin_account(self.target)['balance'])
+                my_avg_price = session.query(Account.avg_buy_price).filter(Account.ticker == self.target).first()[0]
+                my_current_volume = session.query(Account.balance).filter(Account.ticker == self.target).first()[0]
                 
                 # 평단 * profit 보다 현재 가격이 높으면 매도
                 if my_avg_price * (1.0 + self.profit) <= current_price:  
