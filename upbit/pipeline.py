@@ -38,28 +38,33 @@ def collect_account():
         Base.metadata.create_all(engine)
 
     else:
+        # 나의 자산 정보 update
         for coin in valid_account:
             tick = coin['currency']
             balance = coin['balance']
             avg = coin['avg_buy_price']
             if not session.query(Account).filter(Account.ticker == tick).first():
                 insert_accounts(tick, float(balance), float(avg))
+            else:
+                update_accounts(tick, float(balance), float(avg))
         
-        for coin in valid_account:
-            tick = coin['currency']
-            balance = coin['balance']
-            avg = coin['avg_buy_price']
-            update_accounts(tick, float(balance), float(avg))
+        # 매도 후 없는 자산 삭제
+        coin_in_account = session.query(Account.ticker).all()
+        for coin in [c[0] for c in coin_in_account]:
+            if coin not in valid_account:
+                delete_on_account(coin)
 
 
 if __name__ == "__main__":
     tickers = ['BTC', 'ETH', 'LINK']
 
-    sched.add_job(collect_price, 'cron', minute='0, 15, 30, 45', args=[tickers])
-    sched.add_job(collect_account, 'cron', minute='20')
+    # sched.add_job(collect_price, 'cron', minute='0, 15, 30, 45', args=[tickers])
+    # sched.add_job(collect_account, 'cron', minute='20')
     crypto = Crypto.for_symbol("LINK")
     s = session.query(crypto).all()
     q = session.query(crypto.price).order_by(crypto.time.desc()).first()[0]
-    print(q)
-    # while True:
-    #     time.sleep(1)
+    r = session.query(Account.ticker).all()
+    
+    #insert_accounts("ADA", 1., 2.)
+    delete_on_account("ADA")
+

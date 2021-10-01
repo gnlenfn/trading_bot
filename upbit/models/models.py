@@ -96,6 +96,9 @@ def insert_records(ticker, order, avg, num, price, holds, rounds, cycle):
 
 
 def insert_accounts(tick, balance, avg):
+    if session.query(Account).filter(Account.ticker == tick).first():
+        return
+
     table = Crypto.for_symbol(tick)
     if tick == 'KRW':
         status = insert(Account).values(ticker=tick,
@@ -138,6 +141,12 @@ def update_accounts(tick, balance, avg):
                                     current_value=balance * q,
                                     bought_value=balance * avg).\
                                 where(Account.ticker==tick)
+    connect.execute(status)
+
+
+def delete_on_account(ticker):
+    ticker = ticker.upper()
+    status = delete(Account).where(Account.ticker == ticker)
     connect.execute(status)
 
 
