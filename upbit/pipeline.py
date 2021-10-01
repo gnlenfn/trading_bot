@@ -51,7 +51,7 @@ def collect_account():
         # 매도 후 없는 자산 삭제
         coin_in_account = session.query(Account.ticker).all()
         for coin in [c[0] for c in coin_in_account]:
-            if coin not in valid_account:
+            if coin not in [crypto['currency'] for crypto in valid_account]:
                 delete_on_account(coin)
 
 
@@ -66,5 +66,6 @@ if __name__ == "__main__":
     r = session.query(Account.ticker).all()
     
     #insert_accounts("ADA", 1., 2.)
-    delete_on_account("ADA")
+    #delete_on_account("ADA")
+
 
