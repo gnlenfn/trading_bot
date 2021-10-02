@@ -43,10 +43,10 @@ def collect_account():
             tick = coin['currency']
             balance = coin['balance']
             avg = coin['avg_buy_price']
-            if not session.query(Account).filter(Account.ticker == tick).first():
-                insert_accounts(tick, float(balance), float(avg))
-            else:
+            if session.query(Account).filter(Account.ticker == tick).first():
                 update_accounts(tick, float(balance), float(avg))
+            else:
+                insert_accounts(tick, float(balance), float(avg))
         
         # 매도 후 없는 자산 삭제
         coin_in_account = session.query(Account.ticker).all()

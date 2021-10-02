@@ -39,7 +39,8 @@ class infinite:
     def infinite_bid(self):
         try:
             crypto = Crypto.for_symbol(self.target)         # price table of self.target
-            current_price = session.query(crypto.price).order_by(crypto.time.desc()).first()[0]  # current price = order_by time last one
+            current_price = upbit_basic.get_trade_price("KRW-"+self.target, "minutes", "1", "1")['trade_price']
+            # session.query(crypto.price).order_by(crypto.time.desc()).first()[0]  # current price = order_by time last one
             order_vol = self.minimum_order / current_price            
             
 
