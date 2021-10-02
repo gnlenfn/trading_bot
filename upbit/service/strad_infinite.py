@@ -97,7 +97,7 @@ class infinite:
                                     holds=my_current_volume,
                                     rounds=self.num, cycle=self.num // 40 + 1)
 
-                    avg_buy_after = session.query(Account.avg_buy_price).filter(Account.ticker == self.target).first()[0]
+                    avg_buy_after = float(upbit_basic.get_coin_account(self.target)['avg_buy_price'])
 
                     logger.info(
                         f"{self.num % 40}회차 매수\n"+
